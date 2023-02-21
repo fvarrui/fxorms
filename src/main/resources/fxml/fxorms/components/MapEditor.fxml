@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root fx:id="view" type="BorderPane"
+	xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<TableView fx:id="itemsTable" prefHeight="100.0"
+			BorderPane.alignment="CENTER">
+			<columns>
+				<TableColumn fx:id="nameColumn" editable="false"
+					prefWidth="75.0" text="Name" />
+				<TableColumn fx:id="valueColumn" editable="false"
+					prefWidth="75.0" text="Value" />
+			</columns>
+			<columnResizePolicy>
+				<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+			</columnResizePolicy>
+		</TableView>
+	</center>
+	<right>
+		<VBox spacing="5.0" BorderPane.alignment="CENTER">
+			<children>
+				<Button fx:id="removeButton" contentDisplay="GRAPHIC_ONLY"
+					layoutX="15.0" layoutY="10.0" maxWidth="1.7976931348623157E308"
+					onAction="#onRemoveAction" text="Add">
+					<graphic>
+						<ImageView pickOnBounds="true" preserveRatio="true">
+							<image>
+								<Image url="@../../../images/trash-alt-solid.png" />
+							</image>
+						</ImageView>
+					</graphic>
+					<tooltip>
+						<Tooltip text="Remove item" />
+					</tooltip>
+				</Button>
+			</children>
+			<padding>
+				<Insets left="5.0" />
+			</padding>
+		</VBox>
+	</right>
+</fx:root>
