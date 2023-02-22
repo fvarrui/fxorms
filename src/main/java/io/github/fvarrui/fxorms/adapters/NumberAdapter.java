@@ -30,10 +30,11 @@ public class NumberAdapter extends FieldAdapter<TextField, Property<Number>> {
 
 	@Override
 	public boolean isReadOnly(Field field) {
-		return (ReadOnlyDoubleWrapper.class.isAssignableFrom(field.getType()) ||
+		return 	super.isReadOnly(field) || 
+				ReadOnlyDoubleWrapper.class.isAssignableFrom(field.getType()) ||
 				ReadOnlyLongWrapper.class.isAssignableFrom(field.getType()) ||
 				ReadOnlyIntegerWrapper.class.isAssignableFrom(field.getType()) ||
-				ReadOnlyFloatWrapper.class.isAssignableFrom(field.getType()));
+				ReadOnlyFloatWrapper.class.isAssignableFrom(field.getType());
 	}
 
 	@Override
