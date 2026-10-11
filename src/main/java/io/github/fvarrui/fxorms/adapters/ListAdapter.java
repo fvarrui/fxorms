@@ -1,22 +1,22 @@
 package io.github.fvarrui.fxorms.adapters;
 
-import java.lang.reflect.Field;
+import io.github.fvarrui.fxorms.BeanProperty;
 
 import io.github.fvarrui.fxorms.components.ListEditor;
-import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 
 public class ListAdapter extends FieldAdapter<ListEditor, ObservableValue<ObservableList<Object>>> {
 	
 	public ListAdapter() {
-		super(ListProperty.class);
+		super(ReadOnlyListProperty.class);
 	}
 	
 	@Override
-	public ListEditor build(Field field) {
+	public ListEditor build(BeanProperty property) {
 		ListEditor editor = new ListEditor();
-		editor.setDisable(isReadOnly(field));
+		editor.setDisable(isReadOnly(property));
 		return editor;
 	}
 

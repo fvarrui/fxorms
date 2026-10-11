@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,12 +20,14 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import io.github.fvarrui.fxorms.BeanProperty;
 import io.github.fvarrui.fxorms.Form;
 import io.github.fvarrui.fxorms.FormBuilder;
 import io.github.fvarrui.fxorms.adapters.FieldAdapter;
 import io.github.fvarrui.fxorms.adapters.ObjectAdapter;
 import io.github.fvarrui.fxorms.adapters.TextBinding;
 import io.github.fvarrui.fxorms.annotations.Multiline;
+import io.github.fvarrui.fxorms.annotations.Order;
 import io.github.fvarrui.fxorms.annotations.Format;
 import io.github.fvarrui.fxorms.annotations.ReadOnly;
 import io.github.fvarrui.fxorms.components.ListEditor;
@@ -38,7 +39,9 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -61,6 +64,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 public class FormTest {
@@ -78,6 +82,15 @@ public class FormTest {
 		ListProperty<Object> tags = new SimpleListProperty<>(FXCollections.observableArrayList());
 		MapProperty<String, Object> extra = new SimpleMapProperty<>(FXCollections.observableHashMap());
 		String notAProperty = "ignored";
+		public StringProperty firstNameProperty() { return firstName; }
+		public StringProperty notesProperty() { return notes; }
+		public IntegerProperty ageProperty() { return age; }
+		public DoubleProperty heightProperty() { return height; }
+		public BooleanProperty activeProperty() { return active; }
+		public ObjectProperty<LocalDateTime> birthProperty() { return birth; }
+		public ListProperty<Object> tagsProperty() { return tags; }
+		public MapProperty<String, Object> extraProperty() { return extra; }
+		public String getNotAProperty() { return notAProperty; }
 	}
 
 	public static class ReadOnlyBean {
@@ -85,16 +98,23 @@ public class FormTest {
 		StringProperty code = new SimpleStringProperty();
 		ReadOnlyStringWrapper label = new ReadOnlyStringWrapper();
 		ReadOnlyIntegerWrapper count = new ReadOnlyIntegerWrapper();
+		public StringProperty codeProperty() { return code; }
+		public ReadOnlyStringProperty labelProperty() { return label.getReadOnlyProperty(); }
+		public ReadOnlyIntegerProperty countProperty() { return count.getReadOnlyProperty(); }
 	}
 
 	public static class ConcreteTypesBean {
 		SimpleStringProperty name = new SimpleStringProperty();
 		SimpleIntegerProperty size = new SimpleIntegerProperty();
+		public SimpleStringProperty nameProperty() { return name; }
+		public SimpleIntegerProperty sizeProperty() { return size; }
 	}
 
 	public static class GenericsBean {
 		ObjectProperty<List<String>> nested = new SimpleObjectProperty<>();
 		ObjectProperty<Color> color = new SimpleObjectProperty<>();
+		public ObjectProperty<List<String>> nestedProperty() { return nested; }
+		public ObjectProperty<Color> colorProperty() { return color; }
 	}
 
 	public static class ColorAdapter extends ObjectAdapter<ColorPicker, Property<Color>> {
@@ -102,7 +122,7 @@ public class FormTest {
 			super(Color.class);
 		}
 		@Override
-		public ColorPicker build(Field field) {
+		public ColorPicker build(BeanProperty property) {
 			return new ColorPicker();
 		}
 		@Override
@@ -120,7 +140,7 @@ public class FormTest {
 			super(StringProperty.class);
 		}
 		@Override
-		public Label build(Field field) {
+		public Label build(BeanProperty property) {
 			return new Label();
 		}
 		@Override
@@ -320,6 +340,10 @@ public class FormTest {
 		ObjectProperty<LocalDateTime> when = new SimpleObjectProperty<>();
 		@Format("yyyy-MM-dd HH:mm:ss")
 		ObjectProperty<LocalDateTime> stamp = new SimpleObjectProperty<>();
+		public IntegerProperty idProperty() { return id; }
+		public DoubleProperty priceProperty() { return price; }
+		public ObjectProperty<LocalDateTime> whenProperty() { return when; }
+		public ObjectProperty<LocalDateTime> stampProperty() { return stamp; }
 	}
 
 	private static <T> T withLocale(Locale locale, Callable<T> task) throws Exception {
@@ -433,6 +457,11 @@ public class FormTest {
 		ObjectProperty<Size> fixedSize = new SimpleObjectProperty<>();
 		@Format("dd/MM/yyyy")
 		ObjectProperty<LocalDate> formattedDay = new SimpleObjectProperty<>();
+		public ObjectProperty<LocalDate> dayProperty() { return day; }
+		public ObjectProperty<Size> sizeProperty() { return size; }
+		public ObjectProperty<LocalDate> fixedDayProperty() { return fixedDay; }
+		public ObjectProperty<Size> fixedSizeProperty() { return fixedSize; }
+		public ObjectProperty<LocalDate> formattedDayProperty() { return formattedDay; }
 	}
 
 	@Test
@@ -479,6 +508,123 @@ public class FormTest {
 		Form<DatesAndEnumsBean> form = call(() -> new FormBuilder<>(DatesAndEnumsBean.class).build().bind(bean));
 		DatePicker day = control(form, "Formatted day", DatePicker.class);
 		assertEquals("02/01/2024", call(() -> day.getConverter().toString(day.getValue())));
+	}
+
+	// property discovery through accessor methods
+
+	public static class Employee extends Person {
+		StringProperty company = new SimpleStringProperty();
+		public StringProperty companyProperty() { return company; }
+	}
+
+	public static class AccessorBean {
+		private final StringProperty title = new SimpleStringProperty();
+		private final StringProperty computed = new SimpleStringProperty();
+		private final ReadOnlyStringWrapper status = new ReadOnlyStringWrapper("draft");
+		@Multiline(rows = 4)
+		public StringProperty titleProperty() { return title; }
+		public StringProperty summaryProperty() { return computed; } // no backing field named 'summary'
+		@ReadOnly
+		public StringProperty fixedProperty() { return computed; }
+		public ReadOnlyStringProperty statusProperty() { return status.getReadOnlyProperty(); }
+		public static StringProperty sharedProperty() { return new SimpleStringProperty(); }
+	}
+
+	public static class NodeBean extends Region {
+		StringProperty caption = new SimpleStringProperty();
+		public StringProperty captionProperty() { return caption; }
+	}
+
+	static class PackagePrivateBean {
+		StringProperty name = new SimpleStringProperty("hidden");
+		public StringProperty nameProperty() { return name; }
+	}
+
+	@Test
+	void inheritedPropertiesAreIncludedAfterTheSuperclassOnes() {
+		Form<Employee> form = call(() -> new FormBuilder<>(Employee.class).build());
+		assertEquals(
+				List.of("First name:", "Notes:", "Age:", "Height:", "Active:", "Birth:", "Tags:", "Extra:", "Company:"),
+				labels(form));
+	}
+
+	@Test
+	void propertiesWithoutBackingFieldComeLastAndStaticAccessorsAreIgnored() {
+		Form<AccessorBean> form = call(() -> new FormBuilder<>(AccessorBean.class).build());
+		assertEquals(List.of("Title:", "Status:", "Fixed:", "Summary:"), labels(form));
+	}
+
+	@Test
+	void annotationsOnAccessorMethodsAreHonoured() {
+		Form<AccessorBean> form = call(() -> new FormBuilder<>(AccessorBean.class).build());
+		assertEquals(4, control(form, "Title", TextArea.class).getPrefRowCount());
+		assertFalse(control(form, "Fixed", TextInputControl.class).isEditable());
+	}
+
+	@Test
+	void readOnlyAccessorIsShownButNotEditable() {
+		AccessorBean bean = new AccessorBean();
+		Form<AccessorBean> form = call(() -> new FormBuilder<>(AccessorBean.class).build().bind(bean));
+		TextField status = control(form, "Status", TextField.class);
+		assertFalse(status.isEditable());
+		assertEquals("draft", call(status::getText));
+		run(() -> bean.status.set("published"));
+		assertEquals("published", call(status::getText));
+	}
+
+	@Test
+	void readOnlyNumberAccessorFollowsTheBean() {
+		ReadOnlyBean bean = new ReadOnlyBean();
+		Form<ReadOnlyBean> form = call(() -> new FormBuilder<>(ReadOnlyBean.class).build().bind(bean));
+		TextField count = control(form, "Count", TextField.class);
+		run(() -> bean.count.set(3));
+		assertEquals("3", call(count::getText));
+	}
+
+	@Test
+	void demoUserEnabledIsAReadOnlyCheckBox() {
+		User user = new User(1, "Chuck", LocalDateTime.now(), Map.of(), true);
+		Form<User> form = call(() -> new FormBuilder<>(User.class).build().bind(user));
+		CheckBox enabled = control(form, "Enabled", CheckBox.class);
+		assertTrue(enabled.isDisabled());
+		assertTrue(call(enabled::isSelected));
+	}
+
+	@Test
+	void javafxMethodsOfTheBeanSuperclassAreIgnored() {
+		Form<NodeBean> form = call(() -> new FormBuilder<>(NodeBean.class).build());
+		assertEquals(List.of("Caption:"), labels(form));
+	}
+
+	@Test
+	void nonPublicBeanClassesWork() {
+		PackagePrivateBean bean = new PackagePrivateBean();
+		Form<PackagePrivateBean> form = call(() -> new FormBuilder<>(PackagePrivateBean.class).build().bind(bean));
+		assertEquals("hidden", call(control(form, "Name", TextField.class)::getText));
+	}
+
+	// labels and order
+
+	public static class LabelledBean {
+		StringProperty first = new SimpleStringProperty();
+		StringProperty userID = new SimpleStringProperty();
+		@Order(1)
+		StringProperty third = new SimpleStringProperty();
+		@Order(0)
+		@io.github.fvarrui.fxorms.annotations.Label("E-mail address")
+		StringProperty email = new SimpleStringProperty();
+		StringProperty URLPath = new SimpleStringProperty();
+		public StringProperty firstProperty() { return first; }
+		public StringProperty userIDProperty() { return userID; }
+		public StringProperty thirdProperty() { return third; }
+		public StringProperty emailProperty() { return email; }
+		public StringProperty URLPathProperty() { return URLPath; }
+	}
+
+	@Test
+	void labelAndOrderAnnotationsAndAcronymsInLabels() {
+		Form<LabelledBean> form = call(() -> new FormBuilder<>(LabelledBean.class).build());
+		assertEquals(List.of("E-mail address:", "Third:", "First:", "User ID:", "URL path:"), labels(form));
 	}
 
 	// collection editors

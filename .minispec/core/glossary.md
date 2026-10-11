@@ -2,15 +2,19 @@
 
 ## Bean
 
-The user's class whose fields are JavaFX properties (`StringProperty`, `IntegerProperty`, …). A form is built from a bean class and bound to bean instances.
+The user's class exposing JavaFX properties through `xxxProperty()` accessors (`StringProperty`, `IntegerProperty`, …). A form is built from a bean class and bound to bean instances.
 
-## Property field
+## Property
 
-A bean field whose declared type is assignable to `javafx.beans.property.Property`. Each one becomes a row of the form; other fields are ignored.
+A public, non-static, no-arg `xxxProperty()` method of the bean returning a `ReadOnlyProperty`, described by `BeanProperty`. Each one becomes a row of the form; fields and other methods are ignored.
+
+## Backing field
+
+The bean field with the same name as a property (anywhere in the class hierarchy). Optional; used for annotations and row order.
 
 ## Form
 
-The `GridPane` built by `FormBuilder` for a bean class: one row per property field, a label and a control.
+The `GridPane` built by `FormBuilder` for a bean class: one row per property, a label and a control.
 
 ## Adapter
 
@@ -28,6 +32,6 @@ An adapter registered by the user with `FormBuilder.registerFieldAdapter`. It ta
 
 Connecting a form's controls to a bean instance's properties, and disconnecting them. A form is bound to at most one bean at a time.
 
-## Read-only field
+## Read-only property
 
-A property field the form must not let the user edit: annotated with `@ReadOnly`, or declared as a `ReadOnly*Wrapper`.
+A property the form must not let the user edit: annotated with `@ReadOnly`, or whose accessor returns only a `ReadOnlyXxxProperty`.

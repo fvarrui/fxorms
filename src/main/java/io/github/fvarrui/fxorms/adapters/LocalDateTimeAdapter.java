@@ -1,6 +1,5 @@
 package io.github.fvarrui.fxorms.adapters;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
@@ -8,34 +7,35 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
+import io.github.fvarrui.fxorms.BeanProperty;
 import io.github.fvarrui.fxorms.annotations.Format;
-import javafx.beans.property.Property;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
-public class LocalDateTimeAdapter extends ObjectAdapter<TextField, Property<LocalDateTime>> {
+public class LocalDateTimeAdapter extends ObjectAdapter<TextField, ObservableValue<LocalDateTime>> {
 
 	public LocalDateTimeAdapter() {
 		super(LocalDateTime.class);
 	}
 
 	@Override
-	public TextField build(Field field) {
+	public TextField build(BeanProperty property) {
 		TextField control = new TextField();
 		control.setPrefColumnCount(20);
-		control.setEditable(!isReadOnly(field));
-		control.getProperties().put(DateTimeFormatter.class, createFormatter(field));
+		control.setEditable(!isReadOnly(property));
+		control.getProperties().put(DateTimeFormatter.class, createFormatter(property));
 		return control;
 	}
 
 	@Override
-	public void doBind(TextField control, Property<LocalDateTime> property) {
+	public void doBind(TextField control, ObservableValue<LocalDateTime> property) {
 		DateTimeFormatter formatter = (DateTimeFormatter) control.getProperties().get(DateTimeFormatter.class);
 		TextBinding.bind(control, property, new LocalDateTimeConverter(formatter));
 	}
 
 	@Override
-	public void doUnbind(TextField control, Property<LocalDateTime> property) {
+	public void doUnbind(TextField control, ObservableValue<LocalDateTime> property) {
 		TextBinding.unbind(control);
 	}
 
@@ -43,8 +43,8 @@ public class LocalDateTimeAdapter extends ObjectAdapter<TextField, Property<Loca
 	 * The {@link Format} pattern if present; otherwise the locale's MEDIUM
 	 * format, which includes seconds (SHORT drops them).
 	 */
-	private static DateTimeFormatter createFormatter(Field field) {
-		Format format = field.getAnnotation(Format.class);
+	private static DateTimeFormatter createFormatter(BeanProperty property) {
+		Format format = property.getAnnotation(Format.class);
 		Locale locale = Locale.getDefault(Locale.Category.FORMAT);
 		String pattern = format != null ? format.value()
 				: DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, FormatStyle.MEDIUM, IsoChronology.INSTANCE, locale);

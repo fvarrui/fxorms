@@ -45,17 +45,17 @@ public class FieldFactory {
 		}
 	}
 	
-	public FieldAdapter<? extends Node, ? extends Observable> findAdapter(java.lang.reflect.Field field) { 
+	public FieldAdapter<? extends Node, ? extends Observable> findAdapter(BeanProperty property) { 
 		return adapters
 			.stream()
-			.filter(adapter -> adapter.isPropertyType(field))
+			.filter(adapter -> adapter.isPropertyType(property))
 			.findFirst()
 			.orElse(new DefaultAdapter());
 	}
 	
-	public Node buildControl(java.lang.reflect.Field field) {
-		FieldAdapter<? extends Node, ? extends Observable> adapter = findAdapter(field);
-		return adapter.build(field);
+	public Node buildControl(BeanProperty property) {
+		FieldAdapter<? extends Node, ? extends Observable> adapter = findAdapter(property);
+		return adapter.build(property);
 	}
 
 }

@@ -1,64 +1,51 @@
 package io.github.fvarrui.fxorms.adapters;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 
+import io.github.fvarrui.fxorms.BeanProperty;
 import io.github.fvarrui.fxorms.annotations.Format;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyDoubleWrapper;
-import javafx.beans.property.ReadOnlyFloatWrapper;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.ReadOnlyLongWrapper;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyFloatProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyLongProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
-public class NumberAdapter extends FieldAdapter<TextField, Property<Number>> {
+public class NumberAdapter extends FieldAdapter<TextField, ObservableValue<Number>> {
 
 	public NumberAdapter() {
-		super(DoubleProperty.class, LongProperty.class, IntegerProperty.class, FloatProperty.class);
+		super(ReadOnlyDoubleProperty.class, ReadOnlyLongProperty.class, ReadOnlyIntegerProperty.class, ReadOnlyFloatProperty.class);
 	}
 
 	@Override
-	public TextField build(Field field) {
+	public TextField build(BeanProperty property) {
 		TextField control = new TextField();
 		control.setPrefColumnCount(5);
-		control.setEditable(!isReadOnly(field));
-		control.getProperties().put(NumberFormat.class, createFormat(field));
+		control.setEditable(!isReadOnly(property));
+		control.getProperties().put(NumberFormat.class, createFormat(property));
 		return control;
 	}
 
 	@Override
-	public boolean isReadOnly(Field field) {
-		return 	super.isReadOnly(field) ||
-				ReadOnlyDoubleWrapper.class.isAssignableFrom(field.getType()) ||
-				ReadOnlyLongWrapper.class.isAssignableFrom(field.getType()) ||
-				ReadOnlyIntegerWrapper.class.isAssignableFrom(field.getType()) ||
-				ReadOnlyFloatWrapper.class.isAssignableFrom(field.getType());
-	}
-
-	@Override
-	public void doBind(TextField control, Property<Number> property) {
+	public void doBind(TextField control, ObservableValue<Number> property) {
 		NumberFormat format = (NumberFormat) control.getProperties().get(NumberFormat.class);
 		TextBinding.bind(control, property, new StrictNumberConverter(format));
 	}
 
 	@Override
-	public void doUnbind(TextField control, Property<Number> property) {
+	public void doUnbind(TextField control, ObservableValue<Number> property) {
 		TextBinding.unbind(control);
 	}
 
-	private static NumberFormat createFormat(Field field) {
-		Format format = field.getAnnotation(Format.class);
+	private static NumberFormat createFormat(BeanProperty property) {
+		Format format = property.getAnnotation(Format.class);
 		if (format != null) {
 			return new DecimalFormat(format.value());
 		}
-		boolean integer = IntegerProperty.class.isAssignableFrom(field.getType()) || LongProperty.class.isAssignableFrom(field.getType());
+		boolean integer = ReadOnlyIntegerProperty.class.isAssignableFrom(property.getType()) || ReadOnlyLongProperty.class.isAssignableFrom(property.getType());
 		if (integer) {
 			NumberFormat integerFormat = NumberFormat.getIntegerInstance();
 			integerFormat.setGroupingUsed(false);

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * dates and times.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ ElementType.FIELD, ElementType.METHOD })
 public @interface Format {
 	String value();
 }

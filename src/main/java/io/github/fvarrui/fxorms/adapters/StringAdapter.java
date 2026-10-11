@@ -1,24 +1,22 @@
 package io.github.fvarrui.fxorms.adapters;
 
-import java.lang.reflect.Field;
-
+import io.github.fvarrui.fxorms.BeanProperty;
 import io.github.fvarrui.fxorms.annotations.Multiline;
-import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 
-public class StringAdapter extends FieldAdapter<TextInputControl, Property<String>> {
+public class StringAdapter extends FieldAdapter<TextInputControl, ObservableValue<String>> {
 	
 	public StringAdapter() {
-		super(StringProperty.class);
+		super(ReadOnlyStringProperty.class);
 	}
 	
 	@Override
-	public TextInputControl build(Field field) {
-		Multiline multiline = field.getAnnotation(Multiline.class);
+	public TextInputControl build(BeanProperty property) {
+		Multiline multiline = property.getAnnotation(Multiline.class);
 		TextInputControl control;
 		if (multiline != null && multiline.value()) {
 			TextArea textArea = new TextArea();
@@ -30,23 +28,18 @@ public class StringAdapter extends FieldAdapter<TextInputControl, Property<Strin
 			textField.setPrefColumnCount(50);
 			control = textField;
 		}
-		control.setEditable(!isReadOnly(field));
+		control.setEditable(!isReadOnly(property));
 		return control;
 	}
 
 	@Override
-	public boolean isReadOnly(Field field) {
-		return super.isReadOnly(field) || ReadOnlyStringWrapper.class.isAssignableFrom(field.getType());
+	public void doBind(TextInputControl control, ObservableValue<String> property) {
+		bindValue(control.textProperty(), property);
 	}
 
 	@Override
-	public void doBind(TextInputControl control, Property<String> property) {
-		control.textProperty().bindBidirectional(property);
-	}
-
-	@Override
-	public void doUnbind(TextInputControl control, Property<String> property) {
-		control.textProperty().unbindBidirectional(property);
+	public void doUnbind(TextInputControl control, ObservableValue<String> property) {
+		unbindValue(control.textProperty(), property);
 	}
 	
 }

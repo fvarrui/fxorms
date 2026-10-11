@@ -1,10 +1,8 @@
 package io.github.fvarrui.fxorms;
 
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javafx.beans.property.Property;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 
@@ -12,15 +10,15 @@ public class Form<T> extends GridPane {
 
 	private T bean;
 	private final FieldFactory factory;
-	private final Map<Field, Node> controls = new LinkedHashMap<>();
+	private final Map<BeanProperty, Node> controls = new LinkedHashMap<>();
 
 	Form(FieldFactory factory) {
 		super();
 		this.factory = factory;
 	}
 
-	void addControl(Field field, Node control) {
-		controls.put(field, control);
+	void addControl(BeanProperty property, Node control) {
+		controls.put(property, control);
 	}
 
 	public T getBean() {
@@ -31,30 +29,17 @@ public class Form<T> extends GridPane {
 		unbind();
 		if (bean != null) {
 			this.bean = bean;
-			controls.forEach((field, control) -> factory.findAdapter(field).bind(control, getProperty(field, bean)));
+			controls.forEach((property, control) -> factory.findAdapter(property).bind(control, property.get(bean)));
 		}
 		return this;
 	}
 
 	public Form<T> unbind() {
 		if (this.bean != null) {
-			controls.forEach((field, control) -> factory.findAdapter(field).unbind(control, getProperty(field, this.bean)));
+			controls.forEach((property, control) -> factory.findAdapter(property).unbind(control, property.get(this.bean)));
 			this.bean = null;
 		}
 		return this;
-	}
-
-	private Property<?> getProperty(Field field, T bean) {
-		try {
-			field.setAccessible(true);
-			Property<?> property = (Property<?>) field.get(bean);
-			if (property == null) {
-				throw new IllegalStateException("Property field '" + field.getName() + "' is not initialized");
-			}
-			return property;
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException("Cannot read property field '" + field.getName() + "'", e);
-		}
 	}
 
 }

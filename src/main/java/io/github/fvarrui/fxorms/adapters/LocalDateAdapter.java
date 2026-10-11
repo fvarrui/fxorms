@@ -1,39 +1,39 @@
 package io.github.fvarrui.fxorms.adapters;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import io.github.fvarrui.fxorms.BeanProperty;
 import io.github.fvarrui.fxorms.annotations.Format;
-import javafx.beans.property.Property;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.DatePicker;
 import javafx.util.converter.LocalDateStringConverter;
 
-public class LocalDateAdapter extends ObjectAdapter<DatePicker, Property<LocalDate>> {
+public class LocalDateAdapter extends ObjectAdapter<DatePicker, ObservableValue<LocalDate>> {
 
 	public LocalDateAdapter() {
 		super(LocalDate.class);
 	}
 
 	@Override
-	public DatePicker build(Field field) {
+	public DatePicker build(BeanProperty property) {
 		DatePicker control = new DatePicker();
-		Format format = field.getAnnotation(Format.class);
+		Format format = property.getAnnotation(Format.class);
 		if (format != null) {
 			control.setConverter(new LocalDateStringConverter(DateTimeFormatter.ofPattern(format.value()), null));
 		}
-		control.setDisable(isReadOnly(field));
+		control.setDisable(isReadOnly(property));
 		return control;
 	}
 
 	@Override
-	public void doBind(DatePicker control, Property<LocalDate> property) {
-		control.valueProperty().bindBidirectional(property);
+	public void doBind(DatePicker control, ObservableValue<LocalDate> property) {
+		bindValue(control.valueProperty(), property);
 	}
 
 	@Override
-	public void doUnbind(DatePicker control, Property<LocalDate> property) {
-		control.valueProperty().unbindBidirectional(property);
+	public void doUnbind(DatePicker control, ObservableValue<LocalDate> property) {
+		unbindValue(control.valueProperty(), property);
 	}
 
 }

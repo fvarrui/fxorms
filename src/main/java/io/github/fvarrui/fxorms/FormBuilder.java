@@ -1,13 +1,9 @@
 package io.github.fvarrui.fxorms;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.github.fvarrui.fxorms.adapters.FieldAdapter;
 import javafx.beans.Observable;
-import javafx.beans.property.Property;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -51,12 +47,12 @@ public class FormBuilder<T> {
 			
 			form.getRowConstraints().clear();
 	
-			getFields().forEach(field -> { 
+			getProperties().forEach(property -> { 
 		
-				Label label = new Label(getReadableStringFromCamelCase(field.getName()) + ":");
-				Node control = factory.buildControl(field); 
+				Label label = new Label(getLabelText(property) + ":");
+				Node control = factory.buildControl(property); 
 				
-				form.addControl(field, control);
+				form.addControl(property, control);
 				
 				form.addRow(
 					form.getRowCount(), 
@@ -79,11 +75,8 @@ public class FormBuilder<T> {
 			
 	}
 	
-	protected List<Field> getFields() {
-		return Arrays.asList(beanClass.getDeclaredFields())
-			.stream()
-			.filter(field -> Property.class.isAssignableFrom(field.getType()))
-			.collect(Collectors.toList());		
+	protected List<BeanProperty> getProperties() {
+		return BeanProperty.of(beanClass);
 	}
 	
 	public FormBuilder<T> registerFieldAdapter(FieldAdapter<? extends Node, ? extends Observable> adapter) {
@@ -91,20 +84,27 @@ public class FormBuilder<T> {
 		return this;
 	}
 	
-	private String getReadableStringFromCamelCase(String camelCaseString) {
-		boolean firstChar = true;
-		StringBuffer buffer = new StringBuffer();
-		for (char ch : camelCaseString.toCharArray()) {
-			if (firstChar) {
-				buffer.append(Character.toUpperCase(ch));
-				firstChar = false;
-			} else if (Character.isUpperCase(ch)) {
-				buffer.append(" " + Character.toLowerCase(ch));
-				firstChar = false;
+	private static String getLabelText(BeanProperty property) {
+		io.github.fvarrui.fxorms.annotations.Label label = property.getAnnotation(io.github.fvarrui.fxorms.annotations.Label.class);
+		return label != null ? label.value() : getReadableStringFromCamelCase(property.getName());
+	}
+
+	/**
+	 * "lastLogin" → "Last login"; runs of capitals are kept as acronyms:
+	 * "userID" → "User ID", "urlPath" → "Url path", "URLPath" → "URL path".
+	 */
+	static String getReadableStringFromCamelCase(String camelCaseString) {
+		String[] words = camelCaseString.split("(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])");
+		StringBuilder buffer = new StringBuilder();
+		for (int i = 0; i < words.length; i++) {
+			String word = words[i];
+			boolean acronym = word.length() > 1 && word.equals(word.toUpperCase());
+			if (i == 0) {
+				buffer.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
 			} else {
-				buffer.append(ch);				
+				buffer.append(' ').append(acronym ? word : word.toLowerCase());
 			}
-		}		
+		}
 		return buffer.toString();
 	}
 

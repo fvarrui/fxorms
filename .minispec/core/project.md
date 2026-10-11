@@ -2,13 +2,13 @@
 
 ## What
 
-f(x)orms is a Java library that builds JavaFX forms at runtime from a bean whose fields are JavaFX properties, and binds bean instances to them.
+f(x)orms is a Java library that builds JavaFX forms at runtime from a bean that exposes JavaFX properties, and binds bean instances to them.
 
 ## What it does
 
 - Generates one labelled row per property, with a control chosen by the property's type (text, number, boolean, date-time, date, enum, list, map).
 - Binds a bean instance to the form in both directions, and rebinds it to other instances of the same class.
-- Honours field annotations such as `@ReadOnly` and `@Multiline`.
+- Honours annotations such as `@ReadOnly`, `@Multiline`, `@Format`, `@Label` and `@Order`.
 - Lets users plug in their own adapters to render specific types with specific controls.
 
 ## For whom

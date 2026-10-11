@@ -1,22 +1,22 @@
 package io.github.fvarrui.fxorms.adapters;
 
-import java.lang.reflect.Field;
+import io.github.fvarrui.fxorms.BeanProperty;
 
 import io.github.fvarrui.fxorms.components.MapEditor;
-import javafx.beans.property.MapProperty;
+import javafx.beans.property.ReadOnlyMapProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
 
 public class MapAdapter extends FieldAdapter<MapEditor, ObservableValue<ObservableMap<String, Object>>> {
 	
 	public MapAdapter() {
-		super(MapProperty.class);
+		super(ReadOnlyMapProperty.class);
 	}
 	
 	@Override
-	public MapEditor build(Field field) {
+	public MapEditor build(BeanProperty property) {
 		MapEditor editor = new MapEditor();
-		editor.setDisable(isReadOnly(field));
+		editor.setDisable(isReadOnly(property));
 		return editor;
 	}
 

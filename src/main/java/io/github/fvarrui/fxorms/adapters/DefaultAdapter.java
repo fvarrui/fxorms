@@ -1,35 +1,34 @@
 package io.github.fvarrui.fxorms.adapters;
 
-import java.lang.reflect.Field;
-
+import io.github.fvarrui.fxorms.BeanProperty;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.Property;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 
-public class DefaultAdapter extends FieldAdapter<Label, Property<Object>> {
+public class DefaultAdapter extends FieldAdapter<Label, ObservableValue<Object>> {
 	
 	@Override
-	public boolean isPropertyType(Field field) {
+	public boolean isPropertyType(BeanProperty property) {
 		return true;
 	}
 
 	@Override
-	public Label build(Field field) {
-		return new Label(field.getType().getCanonicalName());
+	public Label build(BeanProperty property) {
+		return new Label(property.getType().getCanonicalName());
 	}
 
 	@Override
-	public boolean isReadOnly(Field field) {
+	public boolean isReadOnly(BeanProperty property) {
 		return true;
 	}
 
 	@Override
-	public void doBind(Label control, Property<Object> property) {
+	public void doBind(Label control, ObservableValue<Object> property) {
 		control.textProperty().bind(Bindings.concat(property));
 	}
 
 	@Override
-	public void doUnbind(Label control, Property<Object> property) {
+	public void doUnbind(Label control, ObservableValue<Object> property) {
 		control.textProperty().unbind();
 	}
 
