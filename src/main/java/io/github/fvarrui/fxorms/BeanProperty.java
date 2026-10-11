@@ -24,6 +24,18 @@ import javafx.beans.property.ReadOnlyProperty;
  * A JavaFX property of a bean class, found through its public accessor method
  * ({@code public XxxProperty nameProperty()}), following the JavaFX bean
  * convention.
+ * <p>
+ * A form has one row per bean property. Adapters receive a {@code BeanProperty}
+ * to decide whether they can render it
+ * ({@link io.github.fvarrui.fxorms.adapters.FieldAdapter#isPropertyType(BeanProperty)})
+ * and to build its control, and the form uses it to get the property object of
+ * each bound bean ({@link #get(Object)}).
+ * <p>
+ * Annotations such as {@link io.github.fvarrui.fxorms.annotations.ReadOnly} can
+ * be placed on the accessor method or on the <em>backing field</em>: the field
+ * with the same name as the property, anywhere in the class hierarchy.
+ *
+ * @see FormBuilder
  */
 public final class BeanProperty {
 
@@ -40,10 +52,20 @@ public final class BeanProperty {
 	}
 
 	/**
-	 * Every property of the class, including inherited ones, in form order:
-	 * properties with {@link Order} first (by value), then the rest in the
-	 * declaration order of their backing fields (superclass first), then the
-	 * ones without a backing field, by name.
+	 * Finds every property of a bean class, including inherited ones, in form
+	 * order.
+	 * <p>
+	 * A property is a public, non-static, no-arg method named {@code xxxProperty}
+	 * that returns a {@link ReadOnlyProperty}. Methods declared in {@code javafx.*}
+	 * classes are ignored, so a bean extending a JavaFX class only gets its own
+	 * properties.
+	 * <p>
+	 * Order: properties annotated with {@link Order} first (by value), then the
+	 * rest in the declaration order of their backing fields (superclass fields
+	 * first), then the ones without a backing field, by name.
+	 *
+	 * @param beanClass the bean class
+	 * @return the properties of the class, in form order; empty if it has none
 	 */
 	public static List<BeanProperty> of(Class<?> beanClass) {
 		Map<String, BeanProperty> properties = new LinkedHashMap<>();
@@ -94,16 +116,38 @@ public final class BeanProperty {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Returns the property name: the accessor name without the {@code Property}
+	 * suffix (e.g. {@code "lastLogin"} for {@code lastLoginProperty()}).
+	 *
+	 * @return the property name
+	 */
 	public String getName() {
 		return name;
 	}
 
 	/** Declared return type of the accessor, e.g. {@code StringProperty}. */
+	/**
+	 * Returns the declared return type of the accessor, e.g.
+	 * {@code StringProperty} or {@code ReadOnlyBooleanProperty}. Adapters match
+	 * on this type.
+	 *
+	 * @return the accessor's return type
+	 */
 	public Class<?> getType() {
 		return accessor.getReturnType();
 	}
 
 	/** Type arguments of the accessor's return type, e.g. {@code [LocalDate]} for {@code ObjectProperty<LocalDate>}. */
+	/**
+	 * Returns the type arguments of the accessor's return type, e.g.
+	 * {@code [LocalDate]} for {@code ObjectProperty<LocalDate>}. Parameterized
+	 * arguments are reduced to their raw class ({@code List} for
+	 * {@code ObjectProperty<List<String>>}); wildcards and type variables become
+	 * {@code Object}.
+	 *
+	 * @return the type arguments, or an empty list if the type isn't parameterized
+	 */
 	public List<Class<?>> getGenericTypes() {
 		Type genericType = accessor.getGenericReturnType();
 		if (!(genericType instanceof ParameterizedType)) {
@@ -125,11 +169,27 @@ public final class BeanProperty {
 	}
 
 	/** True when the accessor returns a writable {@link Property}, not only a {@link ReadOnlyProperty}. */
+	/**
+	 * Tells whether the accessor returns a writable {@link Property}, rather than
+	 * only a {@link ReadOnlyProperty}. Properties that aren't writable are always
+	 * rendered read-only.
+	 *
+	 * @return {@code true} if the property can be written through its accessor
+	 */
 	public boolean isWritable() {
 		return Property.class.isAssignableFrom(getType());
 	}
 
 	/** The annotation on the accessor method, or else on the backing field with the same name. */
+	/**
+	 * Returns an annotation of the property, looking first at the accessor method
+	 * and then at the backing field with the same name.
+	 *
+	 * @param <A> the annotation type
+	 * @param annotationClass the annotation class to look for
+	 * @return the annotation, or {@code null} if neither the accessor nor the
+	 *         backing field has it
+	 */
 	public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
 		A annotation = accessor.getAnnotation(annotationClass);
 		if (annotation == null && field != null) {
@@ -144,6 +204,16 @@ public final class BeanProperty {
 	}
 
 	/** The property object of the given bean instance. */
+	/**
+	 * Returns the property object of a bean instance, by calling its accessor.
+	 *
+	 * @param bean the bean instance; must be an instance of the class this property
+	 *             was found in
+	 * @return the property object returned by the accessor
+	 * @throws IllegalStateException if the accessor returns {@code null}, throws,
+	 *         or can't be called (for example, when the bean is in a named module
+	 *         that doesn't export its package to this library)
+	 */
 	public ReadOnlyProperty<?> get(Object bean) {
 		try {
 			ReadOnlyProperty<?> property = (ReadOnlyProperty<?>) accessor.invoke(bean);

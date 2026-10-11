@@ -14,6 +14,7 @@
 - Converters must reject partial input (e.g. "12abc"), not parse a prefix.
 - Don't swallow exceptions with `printStackTrace()`; throw an unchecked exception with a message that names the property.
 - Keep the public API small: helpers used only inside the library stay package-private.
+- Every public and protected type and member has complete Javadoc (`@param`, `@return`, `@throws`); `mvn javadoc:javadoc` must pass with no warnings. Each package has a `package-info.java`.
 - A new package must be added to `module-info.java`; a package with FXML controllers must also be opened to `javafx.fxml`.
 
 ## Tests

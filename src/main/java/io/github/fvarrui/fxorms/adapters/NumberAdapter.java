@@ -14,8 +14,21 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
+/**
+ * Renders numeric properties ({@code int}, {@code long}, {@code float} and
+ * {@code double}) as a {@link TextField}.
+ * <p>
+ * Integers are shown without grouping separators (12345, not 12,345); decimals
+ * use the default locale's number format. {@link Format} sets a
+ * {@link DecimalFormat} pattern instead. Text that isn't a complete number
+ * (empty, "abc", "12abc", or "3.7" for an integer) marks the field as invalid
+ * and leaves the property unchanged (see {@link TextBinding}).
+ */
 public class NumberAdapter extends FieldAdapter<TextField, ObservableValue<Number>> {
 
+	/**
+	 * Creates the adapter for integer, long, float and double properties.
+	 */
 	public NumberAdapter() {
 		super(ReadOnlyDoubleProperty.class, ReadOnlyLongProperty.class, ReadOnlyIntegerProperty.class, ReadOnlyFloatProperty.class);
 	}

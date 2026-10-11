@@ -18,6 +18,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 
+/**
+ * Control that shows the items of a list and lets the user remove them. Used by
+ * {@link io.github.fvarrui.fxorms.adapters.ListAdapter}.
+ * <p>
+ * The editor works on the list itself: when {@link #itemsProperty()} is bound
+ * to a bean's list property, removing an item removes it from the bean's
+ * list.
+ */
 public class ListEditor extends BorderPane implements Initializable {
 
 	// model
@@ -36,6 +44,12 @@ public class ListEditor extends BorderPane implements Initializable {
 	@FXML
 	private BorderPane view;
 
+	/**
+	 * Creates an empty editor, loading its layout from
+	 * {@code /fxml/fxorms/components/ListEditor.fxml}.
+	 *
+	 * @throws RuntimeException if the layout can't be loaded
+	 */
 	public ListEditor() {
 		super();
 		try {
@@ -48,6 +62,13 @@ public class ListEditor extends BorderPane implements Initializable {
 		}
 	}
 
+	/**
+	 * Sets up the bindings between the list view, the remove button and the items.
+	 * Called by the {@link FXMLLoader}; not meant to be called directly.
+	 *
+	 * @param location the location of the FXML file
+	 * @param resources the resource bundle, or {@code null}
+	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
@@ -64,14 +85,29 @@ public class ListEditor extends BorderPane implements Initializable {
 		items.remove(selectedItem.get());
 	}
 
+	/**
+	 * The items shown by the editor.
+	 *
+	 * @return the items property
+	 */
 	public final ListProperty<Object> itemsProperty() {
 		return this.items;
 	}
 
+	/**
+	 * Gets the items shown by the editor.
+	 *
+	 * @return the items
+	 */
 	public final ObservableList<Object> getItems() {
 		return this.itemsProperty().get();
 	}
 
+	/**
+	 * Sets the items shown by the editor.
+	 *
+	 * @param items the items
+	 */
 	public final void setItems(final ObservableList<Object> items) {
 		this.itemsProperty().set(items);
 	}

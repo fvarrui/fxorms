@@ -70,6 +70,18 @@
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.12.0</version>
+				<configuration>
+					<doclint>all</doclint>
+					<failOnWarnings>true</failOnWarnings>
+					<links>
+						<link>https://openjfx.io/javadoc/21/</link>
+					</links>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

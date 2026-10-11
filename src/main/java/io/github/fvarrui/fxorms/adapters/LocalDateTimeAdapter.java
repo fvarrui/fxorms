@@ -13,8 +13,21 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
+/**
+ * Renders {@code ObjectProperty<LocalDateTime>} as a {@link TextField}.
+ * <p>
+ * Values use the default locale's MEDIUM format, which includes seconds (e.g.
+ * "Jan 2, 2024, 3:04:05 AM"), or the {@link java.time.format.DateTimeFormatter}
+ * pattern of a {@link Format} annotation. Parsing ignores case, and plain spaces
+ * are accepted where the locale's format uses no-break spaces. Empty text sets
+ * the value to {@code null}; text that can't be parsed marks the field as
+ * invalid and leaves the property unchanged (see {@link TextBinding}).
+ */
 public class LocalDateTimeAdapter extends ObjectAdapter<TextField, ObservableValue<LocalDateTime>> {
 
+	/**
+	 * Creates the adapter for {@code LocalDateTime} object properties.
+	 */
 	public LocalDateTimeAdapter() {
 		super(LocalDateTime.class);
 	}

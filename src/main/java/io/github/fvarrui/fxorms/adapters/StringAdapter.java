@@ -8,8 +8,16 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 
+/**
+ * Renders string properties as a {@link TextField}, or as a {@link TextArea}
+ * when annotated with {@link Multiline}. Read-only properties are shown in a
+ * non-editable control, so their text can still be selected and copied.
+ */
 public class StringAdapter extends FieldAdapter<TextInputControl, ObservableValue<String>> {
 	
+	/**
+	 * Creates the adapter for {@code StringProperty} and {@code ReadOnlyStringProperty}.
+	 */
 	public StringAdapter() {
 		super(ReadOnlyStringProperty.class);
 	}

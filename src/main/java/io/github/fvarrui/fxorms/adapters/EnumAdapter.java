@@ -4,8 +4,16 @@ import io.github.fvarrui.fxorms.BeanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ComboBox;
 
+/**
+ * Renders {@code ObjectProperty<E>} of any enum type {@code E} as a
+ * {@link ComboBox} with all the enum's constants, disabled when the property is
+ * read-only.
+ */
 public class EnumAdapter extends ObjectAdapter<ComboBox<Object>, ObservableValue<Object>> {
 
+	/**
+	 * Creates the adapter for enum object properties.
+	 */
 	public EnumAdapter() {
 		super(Enum.class);
 	}

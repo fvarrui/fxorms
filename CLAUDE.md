@@ -13,5 +13,6 @@ The project description, architecture, stack and conventions live in `.minispec/
 - `mvn compile` builds the library (Java 17, JavaFX 21 LTS; see ADR-001 before bumping either).
 - `mvn test` runs the JUnit 6 suite headlessly: surefire sets `glass.platform=Monocle`/`monocle.platform=Headless`, so no window opens and no display is needed. The "Unsupported JavaFX configuration: classes were loaded from 'unnamed module'" warning is expected (JavaFX on the classpath).
 - `mvn test -Dtest=FormTest#bindsTextBidirectionally` runs a single test.
+- `mvn javadoc:javadoc` generates the API docs in `target/reports/apidocs/`. It runs with `doclint=all` and `failOnWarnings`, so any public or protected member without complete Javadoc fails the build.
 - Tests touch JavaFX through `FxThread` (`src/test/java/.../FxThread.java`): `FxThread.call(...)`/`run(...)` execute on the FX thread and wait. Controls in a built form are found by their row label (see `FormTest.control(...)`).
 - `EditUserApp` and `User` are a manual visual demo; `AppTest` launches it but is `@Disabled` because it blocks until the window is closed.

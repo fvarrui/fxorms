@@ -11,13 +11,27 @@ import javafx.beans.property.ReadOnlySetProperty;
 import javafx.scene.Node;
 
 /**
- * Base for adapters of {@code ObjectProperty<X>}: matches when the property's
- * type argument is assignable to {@code X}.
+ * Base for adapters of {@code ObjectProperty<X>}: matches object properties
+ * whose type argument is assignable to {@code X}. For example, {@link EnumAdapter}
+ * passes {@code Enum.class}, so it matches {@code ObjectProperty<Size>} for
+ * any enum {@code Size}.
+ * <p>
+ * List, map and set properties are never matched, although they are object
+ * properties too.
+ *
+ * @param <T> the control type
+ * @param <U> the type of the bean's property object the control binds to
  */
 public abstract class ObjectAdapter<T extends Node, U> extends FieldAdapter<T, U> {
 	
 	private Type genericType; 
 	
+	/**
+	 * Creates an adapter for object properties of the given value type.
+	 *
+	 * @param type the value type {@code X} of the {@code ObjectProperty<X>}
+	 *             properties to match; subtypes match too
+	 */
 	public ObjectAdapter(Type type) {
 		super(ReadOnlyObjectProperty.class);
 		this.genericType = type;

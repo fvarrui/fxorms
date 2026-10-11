@@ -5,8 +5,15 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.CheckBox;
 
+/**
+ * Renders boolean properties as a {@link CheckBox}, disabled when the property
+ * is read-only.
+ */
 public class BooleanAdapter extends FieldAdapter<CheckBox, ObservableValue<Boolean>> {
 	
+	/**
+	 * Creates the adapter for {@code BooleanProperty} and {@code ReadOnlyBooleanProperty}.
+	 */
 	public BooleanAdapter() {
 		super(ReadOnlyBooleanProperty.class);
 	}

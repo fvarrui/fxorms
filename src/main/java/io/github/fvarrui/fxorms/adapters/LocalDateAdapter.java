@@ -9,8 +9,16 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.DatePicker;
 import javafx.util.converter.LocalDateStringConverter;
 
+/**
+ * Renders {@code ObjectProperty<LocalDate>} as a {@link DatePicker}, disabled
+ * when the property is read-only. A {@link Format} annotation sets the
+ * {@link DateTimeFormatter} pattern of the picker's text.
+ */
 public class LocalDateAdapter extends ObjectAdapter<DatePicker, ObservableValue<LocalDate>> {
 
+	/**
+	 * Creates the adapter for {@code LocalDate} object properties.
+	 */
 	public LocalDateAdapter() {
 		super(LocalDate.class);
 	}

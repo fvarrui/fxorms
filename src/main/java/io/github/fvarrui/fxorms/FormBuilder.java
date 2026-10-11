@@ -13,16 +13,47 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
+/**
+ * Builds {@link Form forms} for a bean class.
+ * <p>
+ * Typical use:
+ * <pre>{@code
+ * Form<User> form = new FormBuilder<>(User.class).build();
+ * form.bind(user);
+ * }</pre>
+ * Each bean property (see {@link BeanProperty}) becomes a row with a label and a
+ * control. The control is chosen by the first {@link FieldAdapter adapter} that
+ * supports the property's type: custom adapters registered with
+ * {@link #registerFieldAdapter(FieldAdapter)} first, then the built-in ones,
+ * and a read-only label as fallback.
+ * <p>
+ * A builder can build several forms; each one is independent.
+ *
+ * @param <T> the bean type
+ */
 public class FormBuilder<T> {
 	
 	private Class<T> beanClass;
 	private FieldFactory factory;
 
+	/**
+	 * Creates a builder for a bean class, with the built-in adapters.
+	 *
+	 * @param beanClass the bean class whose properties the forms will show
+	 */
 	public FormBuilder(Class<T> beanClass) {
 		this.factory = new FieldFactory();
 		this.beanClass = beanClass;
 	}
 	
+	/**
+	 * Builds a new, unbound form with a row per bean property. Row labels come
+	 * from {@link io.github.fvarrui.fxorms.annotations.Label}, or are generated from
+	 * the property name ({@code "lastLogin"} becomes "Last login",
+	 * {@code "userID"} becomes "User ID").
+	 *
+	 * @return a new form; bind it to a bean with {@link Form#bind(Object)}
+	 */
 	public Form<T> build() {
 		
 		try { 
@@ -75,15 +106,33 @@ public class FormBuilder<T> {
 			
 	}
 	
+	/**
+	 * Returns the properties that become form rows, in row order. Subclasses can
+	 * override it to filter or reorder them.
+	 *
+	 * @return the bean class properties (see {@link BeanProperty#of(Class)})
+	 */
 	protected List<BeanProperty> getProperties() {
 		return BeanProperty.of(beanClass);
 	}
 	
+	/**
+	 * Registers a custom adapter to render the properties it supports. Custom
+	 * adapters take precedence over the built-in ones, and the last one registered
+	 * wins over earlier ones.
+	 *
+	 * @param adapter the adapter to register; {@code null} is ignored
+	 * @return this builder, for chaining
+	 */
 	public FormBuilder<T> registerFieldAdapter(FieldAdapter<? extends Node, ? extends Observable> adapter) {
 		factory.registerAdapter(adapter);
 		return this;
 	}
 	
+	/**
+	 * Label text of a property: its {@link io.github.fvarrui.fxorms.annotations.Label}
+	 * annotation, or a text generated from its name.
+	 */
 	private static String getLabelText(BeanProperty property) {
 		io.github.fvarrui.fxorms.annotations.Label label = property.getAnnotation(io.github.fvarrui.fxorms.annotations.Label.class);
 		return label != null ? label.value() : getReadableStringFromCamelCase(property.getName());
