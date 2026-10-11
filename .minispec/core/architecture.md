@@ -19,7 +19,7 @@ Form.bind(bean)     → BeanProperty.get(bean) (calls xxxProperty()) → FieldAd
 - **`@Multiline(rows = n)`** — on a `StringProperty`, makes `StringAdapter` render a `TextArea`.
 - **`TextBinding`** — two-way binding between a text control and a property through a `StringConverter`. When the converter throws, the property is left unchanged and the control gets the `:invalid` pseudo-class. Used by `NumberAdapter` and `LocalDateTimeAdapter`.
 - **`@Format("pattern")`** — per-property format: a `DecimalFormat` pattern for numbers, a `DateTimeFormatter` pattern for date-times and dates (`DatePicker` converter). Defaults: integers without grouping, decimals with the locale's number format, date-times with the locale's MEDIUM format (keeps seconds).
-- **Default stylesheet** — `FormBuilder` adds `/css/fxorms/form.css` to every form (`.form` style class); it paints `:invalid` text inputs red.
+- **Default stylesheet** — `FormBuilder` adds `/css/fxorms/form.css` to every form (`.form` style class); it paints `:invalid` text inputs red and greys out `:readonly` (non-editable) ones.
 - **`ListEditor` / `MapEditor`** — custom controls used by `ListAdapter`/`MapAdapter`. Each loads an FXML file from `src/main/resources/fxml/fxorms/components/` and is its own controller (`Initializable`). They edit the bean's collection in place: removing a row removes it from the bean.
 
 ## Folder map

@@ -389,7 +389,7 @@ Good to know:
 
 ## Styling
 
-A form is a `GridPane` with the `form` style class: row labels are its direct `.label` children, and inputs that can't be converted have the `:invalid` pseudo-class. Add your own stylesheet to the form or to the scene:
+A form is a `GridPane` with the `form` style class: row labels are its direct `.label` children, inputs that can't be converted have the `:invalid` pseudo-class (red by default), and read-only text inputs have `:readonly` (grey by default). Add your own stylesheet to the form or to the scene:
 
 ```java
 form.getStylesheets().add(getClass().getResource("forms.css").toExternalForm());

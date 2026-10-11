@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,6 +56,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
@@ -65,6 +67,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -627,6 +630,39 @@ public class FormTest {
 	void labelAndOrderAnnotationsAndAcronymsInLabels() {
 		Form<LabelledBean> form = call(() -> new FormBuilder<>(LabelledBean.class).build());
 		assertEquals(List.of("E-mail address:", "Third:", "First:", "User ID:", "URL path:"), labels(form));
+	}
+
+	// default styles
+
+	/** Background colour near the right edge of a text field, where there's no text. */
+	private static Color backgroundOf(TextField field) {
+		WritableImage image = field.snapshot(null, null);
+		return image.getPixelReader().getColor((int) image.getWidth() - 4, (int) image.getHeight() / 2);
+	}
+
+	@Test
+	void readOnlyTextInputsLookDifferentAndKeepTheirTextSelectable() {
+		AccessorBean bean = new AccessorBean();
+		Form<AccessorBean> form = call(() -> new FormBuilder<>(AccessorBean.class).build().bind(bean));
+		TextField status = control(form, "Status", TextField.class);
+		TextField plain = call(() -> {
+			Form<Person> personForm = new FormBuilder<>(Person.class).build();
+			new Scene(personForm);
+			personForm.applyCss();
+			personForm.layout();
+			return control(personForm, "First name", TextField.class);
+		});
+		Color editableBackground = call(() -> backgroundOf(plain));
+		Color readOnlyBackground = call(() -> {
+			new Scene(form);
+			form.applyCss();
+			form.layout();
+			return backgroundOf(status);
+		});
+		assertEquals(Color.WHITE, editableBackground, "editable fields keep the default look");
+		assertNotEquals(editableBackground, readOnlyBackground, "read-only fields must look different");
+		run(status::selectAll);
+		assertEquals("draft", call(status::getSelectedText), "read-only text stays selectable");
 	}
 
 	// access to controls

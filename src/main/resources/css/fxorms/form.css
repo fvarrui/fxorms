@@ -5,3 +5,15 @@
 	-fx-focus-color: #d32f2f;
 	-fx-faint-focus-color: #d32f2f22;
 }
+
+/* read-only text inputs (non-editable, text still selectable): greyed, no focus highlight */
+.form .text-input:readonly {
+	-fx-control-inner-background: #f0f0f0;
+	-fx-text-fill: #505050;
+}
+
+.form .text-input:readonly:focused {
+	-fx-background-color: -fx-text-box-border, -fx-control-inner-background;
+	-fx-background-insets: 0, 1;
+	-fx-background-radius: 3, 2;
+}
