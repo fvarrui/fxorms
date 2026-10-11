@@ -12,6 +12,7 @@ import json
 import os
 import re
 import sys
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -43,7 +44,12 @@ def main():
         sys.exit(__doc__)
     url = 'https://central.sonatype.com/api/v1/publisher/status?id=' + sys.argv[1]
     request = urllib.request.Request(url, method='POST', headers={'Authorization': 'Bearer ' + central_token(server_id())})
-    status = json.load(urllib.request.urlopen(request))
+    try:
+        status = json.load(urllib.request.urlopen(request))
+    except urllib.error.HTTPError as error:
+        reasons = {401: 'the token was rejected (wrong or expired token)',
+                   404: 'no such deployment for this account (wrong id, or it was uploaded with another account)'}
+        sys.exit(f'HTTP {error.code}: {reasons.get(error.code, error.reason)}')
     print('Deployment:', status.get('deploymentId'), '-', status.get('deploymentState'))
     for component, errors in (status.get('errors') or {}).items():
         for error in errors:
