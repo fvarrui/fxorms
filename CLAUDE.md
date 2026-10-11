@@ -16,6 +16,8 @@ The project description, architecture, stack and conventions live in `.minispec/
 - `mvn javadoc:javadoc` generates the API docs in `target/reports/apidocs/`. It runs with `doclint=all` and `failOnWarnings`, so any public or protected member without complete Javadoc fails the build.
 - Tests touch JavaFX through `FxThread` (`src/test/java/.../FxThread.java`): `FxThread.call(...)`/`run(...)` execute on the FX thread and wait. Controls in a built form are found by their row label (see `FormTest.control(...)`).
 - `EditUserApp` and `User` are a manual visual demo; `AppTest` launches it but is `@Disabled` because it blocks until the window is closed.
+- `src/test/java/.../examples/` holds the README use cases (`Examples`), checked by `ExamplesTest` and viewable with `ExamplesApp`. When an example or the look of the controls changes, regenerate the README images in `assets/examples/` with `mvn test -Dtest=ScreenshotsTest -Dscreenshots=true` (headless, US locale) and keep the README snippets in sync with the example code.
+- The Javadoc of the latest release is published to GitHub Pages (https://fvarrui.github.io/fxorms/) by `.github/workflows/javadoc.yml` when a release is published; run the workflow by hand to republish a tag.
 
 ## Project skills
 

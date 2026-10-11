@@ -25,7 +25,7 @@ Publishing is outward-facing and hard to undo: a version on Maven Central can ne
 5. **Build, sign and upload.** `"$MVN" -B -P release clean deploy`. It runs the tests, builds the sources and javadoc jars, signs everything, uploads the bundle and waits until the portal has validated it (`autoPublish=false`, so it's not published yet). The log prints the `deploymentId`.
    - If it fails, run `python .claude/skills/release/central_status.py <deploymentId>` to see the errors. Fix them and deploy again (move the tag if the fix needs a commit). For a namespace error, stop and tell the user how to verify the namespace; carry on with the GitHub release only if they want, and note in the release notes that Maven Central is pending.
 6. **Push.** `git push origin main vX.Y.Z`.
-7. **GitHub release.** `gh release create vX.Y.Z --title "f(x)orms X.Y.Z" -F <notes>` with the six files from `target/`: `fxorms-X.Y.Z.jar`, `-sources.jar`, `-javadoc.jar` and their `.asc`.
+7. **GitHub release.** `gh release create vX.Y.Z --title "f(x)orms X.Y.Z" -F <notes>` with the six files from `target/`: `fxorms-X.Y.Z.jar`, `-sources.jar`, `-javadoc.jar` and their `.asc`. Publishing the release triggers `.github/workflows/javadoc.yml`, which publishes that version's Javadoc to https://fvarrui.github.io/fxorms/; check the run with `gh run list --workflow javadoc.yml`.
 8. **Publish on Central.** Tell the user to review and click Publish at https://central.sonatype.com/publishing/deployments. When they say it's done, `central_status.py` should show `PUBLISHED`; the artifact reaches https://repo1.maven.org/maven2/io/github/fvarrui/fxorms/ within about 30 minutes.
 9. **Next snapshot.** Set `pom.xml` to the next minor `-SNAPSHOT` (e.g. `0.3.0-SNAPSHOT` after `0.2.0`), commit `Prepare X.Y+1.0-SNAPSHOT` and push.
 
@@ -36,7 +36,7 @@ When a version is already tagged and on GitHub, but its Central upload failed or
 1. Check it isn't on Central already: `curl -s -o /dev/null -w "%{http_code}" https://repo1.maven.org/maven2/io/github/fvarrui/fxorms/X.Y.Z/` (404 means it isn't).
 2. Build from the tag in a separate worktree, so `main` isn't touched: `git worktree add <scratchpad>/fxorms-X.Y.Z vX.Y.Z`, then `"$MVN" -B -P release clean deploy` inside it.
 3. Remove the worktree: `git worktree remove <path>`.
-4. After the user publishes it on the portal, edit the GitHub release notes to remove the "Maven Central publication is pending" note (`gh release edit vX.Y.Z -F <notes>`).
+4. After the user publishes it on the portal, remove the "Maven Central publication is pending" notes: in the GitHub release notes (`gh release edit vX.Y.Z -F <notes>`) and in the README "Installation" section.
 
 ## Rules
 
