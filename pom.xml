@@ -6,7 +6,7 @@
 
 	<groupId>io.github.fvarrui</groupId>
 	<artifactId>fxorms</artifactId>
-	<version>0.2.0</version>
+	<version>0.3.0-SNAPSHOT</version>
 
 	<name>fxorms</name>
 	<description>JavaFX form builder: generates forms from JavaFX beans at runtime and binds them to bean instances</description>
