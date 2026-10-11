@@ -2,6 +2,7 @@ name: Javadoc
 
 # Publishes the API docs of the latest release to GitHub Pages (https://fvarrui.github.io/fxorms/).
 # Runs when a release is published; run it by hand to republish a given tag (default: latest release).
+# Release runs execute on the tag, so the github-pages environment allows deployments from main and from tags v*.
 on:
   release:
     types: [ published ]
