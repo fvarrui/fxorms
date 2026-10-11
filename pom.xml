@@ -115,7 +115,7 @@
 	<profiles>
 		<!--
 			Release to Maven Central: mvn -P release deploy
-			Needs the Central Portal token as server "central" in ~/.m2/settings.xml and the
+			Needs the Central Portal token of the account that owns io.github.fvarrui as server "central-fvarrui" in ~/.m2/settings.xml and the
 			GPG passphrase in MAVEN_GPG_PASSPHRASE. The deployment is uploaded and validated,
 			then published by hand at https://central.sonatype.com/publishing/deployments.
 		-->
@@ -168,7 +168,7 @@
 						<version>0.11.0</version>
 						<extensions>true</extensions>
 						<configuration>
-							<publishingServerId>central</publishingServerId>
+							<publishingServerId>central-fvarrui</publishingServerId>
 							<autoPublish>false</autoPublish>
 							<waitUntil>validated</waitUntil>
 						</configuration>

@@ -12,9 +12,9 @@ Publishing is outward-facing and hard to undo: a version on Maven Central can ne
 ## Setup on this machine
 
 - **Maven:** `MVN="$(command -v mvn || ls -d ~/.m2/wrapper/dists/apache-maven-*/*/bin/mvn | sort -V | tail -1)"`.
-- **Central Portal token:** server `central` in `~/.m2/settings.xml`. If it's missing, the same token is in `~/.gradle/gradle.properties` (`ossrhUsername`/`ossrhPassword`); copy it without printing it, and ask the user first.
+- **Central Portal token:** server `central-fvarrui` in `~/.m2/settings.xml` (the release profile's `publishingServerId`). It's the token of the legacy Central Portal account (username/password login) that owns `io.github.fvarrui`. Don't use server `central` or `~/.gradle/gradle.properties`: those hold the token of the user's Google-login account, which owns `io.github.javapackager` (JavaPackager) and can't publish `io.github.fvarrui`. If the token is missing, ask the user to generate one at https://central.sonatype.com/usertoken while logged in to the legacy account, and to leave it in a temporary file; never ask them to paste it in the chat.
 - **GPG:** key `F113D3E7`, published on keyserver.ubuntu.com. The signing plugin reads the passphrase from `MAVEN_GPG_PASSPHRASE`; if it isn't set, take it from `signing.password` in `~/.gradle/gradle.properties` inside the same command, without printing it: `export MAVEN_GPG_PASSPHRASE="$(grep -E '^signing.password=' ~/.gradle/gradle.properties | cut -d= -f2-)"`.
-- **Namespace:** the Central Portal account must have `io.github.fvarrui` verified (central.sonatype.com → Namespaces). Only the user can do that. Until it's verified, every upload fails with "Namespace 'io.github.fvarrui' is not allowed".
+- **Namespace:** `io.github.fvarrui` is verified on the legacy account. "Namespace 'io.github.fvarrui' is not allowed" means the upload used a token of another account.
 
 ## New release
 
