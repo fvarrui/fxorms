@@ -50,7 +50,7 @@ jobs:
           cache: maven
 
       - name: Generate Javadoc
-        run: mvn -B javadoc:javadoc
+        run: mvn -B compile javadoc:javadoc   # javadoc needs the compiled module-info
 
       - uses: actions/configure-pages@v6
 

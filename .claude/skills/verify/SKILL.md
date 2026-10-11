@@ -17,8 +17,8 @@ MVN="$(command -v mvn || ls -d ~/.m2/wrapper/dists/apache-maven-*/*/bin/mvn | so
 
 ## Steps
 
-1. **Tests.** `"$MVN" -B test`. Expect `Tests run: N, Failures: 0, Errors: 0, Skipped: 1` (the skipped one is `AppTest`, the manual demo). The warning "Unsupported JavaFX configuration: classes were loaded from 'unnamed module'" is expected: tests run on the classpath (ADR-004). For one test: `-Dtest=FormTest#methodName`.
-2. **Javadoc.** `"$MVN" -B javadoc:javadoc`. It fails on any warning; list them with `| grep -E "warning|error"`. Every public and protected type and member needs complete Javadoc (`@param`, `@return`, `@throws`), and every package a `package-info.java`.
+1. **Tests.** `"$MVN" -B test`. Expect `Tests run: N, Failures: 0, Errors: 0, Skipped: 2` (the skipped ones are `AppTest`, the manual demo, and `ScreenshotsTest`, which only runs with `-Dscreenshots=true`). The warning "Unsupported JavaFX configuration: classes were loaded from 'unnamed module'" is expected: tests run on the classpath (ADR-004). For one test: `-Dtest=FormTest#methodName`.
+2. **Javadoc.** `"$MVN" -B compile javadoc:javadoc` (without `compile`, a clean checkout fails with "named and unnamed modules"). It fails on any warning; list them with `| grep -E "warning|error"`. Every public and protected type and member needs complete Javadoc (`@param`, `@return`, `@throws`), and every package a `package-info.java`.
 3. **Module path**, only when the change touches `module-info.java`, adds or renames packages, adds FXML-backed components, or changes how resources are loaded: run `.claude/skills/verify/module-smoke-test.sh`. It builds the jar, compiles the sample application module in `modapp/` against it and runs it; it needs a display. It must end with `MODULE SMOKE TEST PASSED`.
 
 ## Report

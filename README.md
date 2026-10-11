@@ -430,9 +430,9 @@ The Javadoc of the latest release is at **[fvarrui.github.io/fxorms](https://fva
 ## Building from source
 
 ```bash
-mvn test               # headless test suite
-mvn javadoc:javadoc    # API docs in target/reports/apidocs
-mvn package            # jar in target/
+mvn test                       # headless test suite
+mvn compile javadoc:javadoc    # API docs in target/reports/apidocs
+mvn package                    # jar in target/
 ```
 
 The screenshots in this README are generated from the examples with `mvn test -Dtest=ScreenshotsTest -Dscreenshots=true`.
