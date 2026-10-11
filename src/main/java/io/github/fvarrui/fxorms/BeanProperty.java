@@ -151,8 +151,12 @@ public final class BeanProperty {
 				throw new IllegalStateException("Property '" + name + "' is null: " + accessor.getName() + "() returned null");
 			}
 			return property;
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			throw new IllegalStateException("Cannot read property '" + name + "' through " + accessor.getName() + "()", e);
+		} catch (IllegalAccessException e) {
+			String module = BeanProperty.class.getModule().getName();
+			throw new IllegalStateException("Cannot access " + accessor.getDeclaringClass().getName() + "." + accessor.getName() + "()"
+					+ (module != null ? "; if the bean is in a named module, export its package to " + module : ""), e);
+		} catch (InvocationTargetException e) {
+			throw new IllegalStateException("Cannot read property '" + name + "' through " + accessor.getName() + "()", e.getCause());
 		}
 	}
 

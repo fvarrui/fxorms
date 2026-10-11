@@ -61,6 +61,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.5.5</version>
 				<configuration>
+					<!-- tests run on the classpath (see ADR-004) -->
+					<useModulePath>false</useModulePath>
 					<systemPropertyVariables>
 						<glass.platform>Monocle</glass.platform>
 						<monocle.platform>Headless</monocle.platform>

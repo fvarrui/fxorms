@@ -14,6 +14,7 @@
 - Converters must reject partial input (e.g. "12abc"), not parse a prefix.
 - Don't swallow exceptions with `printStackTrace()`; throw an unchecked exception with a message that names the property.
 - Keep the public API small: helpers used only inside the library stay package-private.
+- A new package must be added to `module-info.java`; a package with FXML controllers must also be opened to `javafx.fxml`.
 
 ## Tests
 

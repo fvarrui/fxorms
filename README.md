@@ -107,3 +107,44 @@
     A this is the result:
 
     ![screenshot](assets/screenshot.png)
+
+## Requirements
+
+- Java 17+ and JavaFX 21+.
+- Each bean property must have a public accessor following the JavaFX convention: `public StringProperty nameProperty()`. Inherited properties are included. If the accessor returns a `ReadOnlyXxxProperty`, the row is read-only.
+
+## Supported types
+
+| Property type | Control |
+| --- | --- |
+| `StringProperty` | `TextField`, or `TextArea` with `@Multiline` |
+| `IntegerProperty`, `LongProperty`, `DoubleProperty`, `FloatProperty` | `TextField` that marks invalid numbers |
+| `BooleanProperty` | `CheckBox` |
+| `ObjectProperty<LocalDateTime>` | `TextField` that marks invalid date-times |
+| `ObjectProperty<LocalDate>` | `DatePicker` |
+| `ObjectProperty<SomeEnum>` | `ComboBox` with the enum's constants |
+| `ListProperty<Object>` | List editor |
+| `MapProperty<String, Object>` | Map editor |
+
+Any other type is shown as a read-only label, unless you register your own adapter with `registerFieldAdapter(adapter)`. Your adapters take precedence over the built-in ones.
+
+## Annotations
+
+Put them on the property's accessor or on its backing field:
+
+- **`@ReadOnly`.** The row can't be edited.
+- **`@Multiline(rows = 5)`.** Text area instead of a text field.
+- **`@Format("#,##0.00")`.** Number or date-time pattern (`DecimalFormat` or `DateTimeFormatter`).
+- **`@Label("E-mail address")`.** Row label, instead of the one generated from the property name.
+- **`@Order(1)`.** Row position. Rows with an order come first; the rest follow their declaration order.
+
+## Java modules
+
+If your application is a named module, export your bean packages to f(x)orms, because forms call the beans' accessors:
+
+```java
+module com.example.app {
+    requires io.github.fvarrui.fxorms;
+    exports com.example.model to io.github.fvarrui.fxorms;
+}
+```

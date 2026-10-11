@@ -2,7 +2,7 @@
 
 ## Library
 
-- Java 17 (`maven.compiler.release`)
+- Java 17 (`maven.compiler.release`), named module `io.github.fvarrui.fxorms`
 - JavaFX 21 LTS: `javafx-controls`, `javafx-fxml` (`provided` scope)
 
 ## Build

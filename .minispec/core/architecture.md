@@ -24,6 +24,7 @@ Form.bind(bean)     → BeanProperty.get(bean) (calls xxxProperty()) → FieldAd
 
 ## Folder map
 
+- `src/main/java/module-info.java` — module `io.github.fvarrui.fxorms`: exports every package, opens `components` to `javafx.fxml` (ADR-004).
 - `src/main/java/io/github/fvarrui/fxorms/` — `FormBuilder`, `Form`, `BeanProperty`, `FieldFactory`.
 - `.../adapters/` — one adapter per supported property type.
 - `.../annotations/` — annotations for a property's accessor or backing field (`@ReadOnly`, `@Multiline`, `@Format`, `@Label`, `@Order`).
