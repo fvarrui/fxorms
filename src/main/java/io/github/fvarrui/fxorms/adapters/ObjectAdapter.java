@@ -6,6 +6,7 @@ import java.util.List;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.Node;
 
 public abstract class ObjectAdapter<T extends Node, U extends Observable> extends FieldAdapter<T, U> {
@@ -25,5 +26,10 @@ public abstract class ObjectAdapter<T extends Node, U extends Observable> extend
 		List<Class<?>> genericTypes = getGenericTypes(field);
 		return !genericTypes.isEmpty() && ((Class<?>) genericType).isAssignableFrom(genericTypes.get(0));
 	}	
+
+	@Override
+	public boolean isReadOnly(Field field) {
+		return super.isReadOnly(field) || ReadOnlyObjectWrapper.class.isAssignableFrom(field.getType());
+	}
 	
 }

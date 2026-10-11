@@ -18,7 +18,7 @@ A `FieldAdapter` subclass that knows how to render one family of property types:
 
 ## Built-in adapter
 
-An adapter registered by default in `FieldFactory` (string, number, date-time, boolean, map, list). `DefaultAdapter` is the fallback, not a built-in.
+An adapter registered by default in `FieldFactory` (string, number, date-time, date, enum, boolean, map, list). `DefaultAdapter` is the fallback, not a built-in.
 
 ## Custom adapter
 

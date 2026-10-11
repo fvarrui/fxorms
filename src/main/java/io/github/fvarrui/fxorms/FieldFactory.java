@@ -7,8 +7,10 @@ import java.util.List;
 
 import io.github.fvarrui.fxorms.adapters.BooleanAdapter;
 import io.github.fvarrui.fxorms.adapters.DefaultAdapter;
+import io.github.fvarrui.fxorms.adapters.EnumAdapter;
 import io.github.fvarrui.fxorms.adapters.FieldAdapter;
 import io.github.fvarrui.fxorms.adapters.ListAdapter;
+import io.github.fvarrui.fxorms.adapters.LocalDateAdapter;
 import io.github.fvarrui.fxorms.adapters.LocalDateTimeAdapter;
 import io.github.fvarrui.fxorms.adapters.MapAdapter;
 import io.github.fvarrui.fxorms.adapters.NumberAdapter;
@@ -22,6 +24,8 @@ public class FieldFactory {
 			new StringAdapter(),
 			new NumberAdapter(),
 			new LocalDateTimeAdapter(),
+			new LocalDateAdapter(),
+			new EnumAdapter(),
 			new BooleanAdapter(),
 			new MapAdapter(),
 			new ListAdapter()

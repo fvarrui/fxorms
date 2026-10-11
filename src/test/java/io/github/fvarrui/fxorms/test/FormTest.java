@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +52,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
@@ -415,6 +418,67 @@ public class FormTest {
 		run(() -> person.age.set(7));
 		assertEquals("7", call(age::getText));
 		assertFalse(isInvalid(age));
+	}
+
+	// date and enum adapters
+
+	public enum Size { SMALL, MEDIUM, LARGE }
+
+	public static class DatesAndEnumsBean {
+		ObjectProperty<LocalDate> day = new SimpleObjectProperty<>();
+		ObjectProperty<Size> size = new SimpleObjectProperty<>();
+		@ReadOnly
+		ObjectProperty<LocalDate> fixedDay = new SimpleObjectProperty<>();
+		@ReadOnly
+		ObjectProperty<Size> fixedSize = new SimpleObjectProperty<>();
+		@Format("dd/MM/yyyy")
+		ObjectProperty<LocalDate> formattedDay = new SimpleObjectProperty<>();
+	}
+
+	@Test
+	void localDateIsEditedWithADatePicker() {
+		DatesAndEnumsBean bean = new DatesAndEnumsBean();
+		bean.day.set(LocalDate.of(2024, 1, 2));
+		Form<DatesAndEnumsBean> form = call(() -> new FormBuilder<>(DatesAndEnumsBean.class).build().bind(bean));
+		DatePicker day = control(form, "Day", DatePicker.class);
+		assertEquals(LocalDate.of(2024, 1, 2), call(day::getValue));
+		run(() -> day.setValue(LocalDate.of(2025, 3, 4)));
+		assertEquals(LocalDate.of(2025, 3, 4), bean.day.get());
+		run(() -> bean.day.set(LocalDate.of(2026, 5, 6)));
+		assertEquals(LocalDate.of(2026, 5, 6), call(day::getValue));
+	}
+
+	@Test
+	void enumIsEditedWithAComboBoxOfItsConstants() {
+		DatesAndEnumsBean bean = new DatesAndEnumsBean();
+		bean.size.set(Size.MEDIUM);
+		Form<DatesAndEnumsBean> form = call(() -> new FormBuilder<>(DatesAndEnumsBean.class).build().bind(bean));
+		@SuppressWarnings("unchecked")
+		ComboBox<Object> size = control(form, "Size", ComboBox.class);
+		assertEquals(List.of(Size.SMALL, Size.MEDIUM, Size.LARGE), call(() -> List.copyOf(size.getItems())));
+		assertEquals(Size.MEDIUM, call(size::getValue));
+		run(() -> size.getSelectionModel().select(Size.LARGE));
+		assertEquals(Size.LARGE, bean.size.get());
+		run(() -> bean.size.set(Size.SMALL));
+		assertEquals(Size.SMALL, call(size::getValue));
+	}
+
+	@Test
+	void readOnlyDatesAndEnumsCannotBeEdited() {
+		Form<DatesAndEnumsBean> form = call(() -> new FormBuilder<>(DatesAndEnumsBean.class).build());
+		assertTrue(control(form, "Fixed day", DatePicker.class).isDisabled());
+		assertTrue(control(form, "Fixed size", ComboBox.class).isDisabled());
+		assertFalse(control(form, "Day", DatePicker.class).isDisabled());
+		assertFalse(control(form, "Size", ComboBox.class).isDisabled());
+	}
+
+	@Test
+	void formatAnnotationAppliesToDates() {
+		DatesAndEnumsBean bean = new DatesAndEnumsBean();
+		bean.formattedDay.set(LocalDate.of(2024, 1, 2));
+		Form<DatesAndEnumsBean> form = call(() -> new FormBuilder<>(DatesAndEnumsBean.class).build().bind(bean));
+		DatePicker day = control(form, "Formatted day", DatePicker.class);
+		assertEquals("02/01/2024", call(() -> day.getConverter().toString(day.getValue())));
 	}
 
 	// collection editors

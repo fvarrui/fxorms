@@ -10,7 +10,6 @@ import java.util.Locale;
 
 import io.github.fvarrui.fxorms.annotations.Format;
 import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
@@ -27,11 +26,6 @@ public class LocalDateTimeAdapter extends ObjectAdapter<TextField, Property<Loca
 		control.setEditable(!isReadOnly(field));
 		control.getProperties().put(DateTimeFormatter.class, createFormatter(field));
 		return control;
-	}
-
-	@Override
-	public boolean isReadOnly(Field field) {
-		return super.isReadOnly(field) || ReadOnlyObjectWrapper.class.isAssignableFrom(field.getType());
 	}
 
 	@Override
