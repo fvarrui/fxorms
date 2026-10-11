@@ -2,6 +2,20 @@
 
  JavaFX form builder.
 
+## Installation
+
+Add the dependency to your project. JavaFX isn't included: your application brings its own (`javafx-controls` and `javafx-fxml` 21 or later).
+
+```xml
+<dependency>
+    <groupId>io.github.fvarrui</groupId>
+    <artifactId>fxorms</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+Gradle: `implementation 'io.github.fvarrui:fxorms:0.1.0'`
+
 ## How to build a form
 
 1. Create your JavaFX bean:

@@ -6,10 +6,37 @@
 
 	<groupId>io.github.fvarrui</groupId>
 	<artifactId>fxorms</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 
 	<name>fxorms</name>
-	<description>JavaFX form builder</description>
+	<description>JavaFX form builder: generates forms from JavaFX beans at runtime and binds them to bean instances</description>
+	<url>https://github.com/fvarrui/fxorms</url>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License v3.0</name>
+			<url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>fvarrui</id>
+			<name>Francisco Vargas Ruiz</name>
+			<url>https://github.com/fvarrui</url>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/fvarrui/fxorms</url>
+		<connection>scm:git:https://github.com/fvarrui/fxorms.git</connection>
+		<developerConnection>scm:git:https://github.com/fvarrui/fxorms.git</developerConnection>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/fvarrui/fxorms/issues</url>
+	</issueManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,5 +111,71 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<!--
+			Release to Maven Central: mvn -P release deploy
+			Needs the Central Portal token as server "central" in ~/.m2/settings.xml and the
+			GPG passphrase in MAVEN_GPG_PASSPHRASE. The deployment is uploaded and validated,
+			then published by hand at https://central.sonatype.com/publishing/deployments.
+		-->
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.4.0</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.2.8</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.11.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+							<autoPublish>false</autoPublish>
+							<waitUntil>validated</waitUntil>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
