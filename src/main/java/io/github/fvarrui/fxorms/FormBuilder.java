@@ -36,6 +36,7 @@ public class FormBuilder<T> {
 			form.setVgap(5);
 			form.setPadding(new Insets(5));
 			form.getStyleClass().add("form");
+			form.getStylesheets().add(FormBuilder.class.getResource("/css/fxorms/form.css").toExternalForm());
 			
 			ColumnConstraints [] cols = {
 				new ColumnConstraints(),

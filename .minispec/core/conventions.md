@@ -9,6 +9,8 @@
 - Match the existing style: tabs for indentation, one public class per file.
 - Every supported property type gets its own `FieldAdapter` subclass in `adapters/`; don't special-case types in `FormBuilder` or `Form`.
 - Adapters must honour `isReadOnly(Field)`: a read-only field must not be editable from the form.
+- Text-input adapters that convert values bind through `TextBinding` with a converter that throws on invalid text. Don't use `Bindings.bindBidirectional(text, property, converter)`: it only logs parse errors, so users get no feedback.
+- Converters must reject partial input (e.g. "12abc"), not parse a prefix.
 - Don't swallow exceptions with `printStackTrace()`; throw an unchecked exception with a message that names the field.
 - Keep the public API small: helpers used only inside the library stay package-private.
 

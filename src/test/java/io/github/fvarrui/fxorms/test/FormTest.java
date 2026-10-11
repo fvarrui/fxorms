@@ -12,7 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +24,9 @@ import io.github.fvarrui.fxorms.Form;
 import io.github.fvarrui.fxorms.FormBuilder;
 import io.github.fvarrui.fxorms.adapters.FieldAdapter;
 import io.github.fvarrui.fxorms.adapters.ObjectAdapter;
+import io.github.fvarrui.fxorms.adapters.TextBinding;
 import io.github.fvarrui.fxorms.annotations.Multiline;
+import io.github.fvarrui.fxorms.annotations.Format;
 import io.github.fvarrui.fxorms.annotations.ReadOnly;
 import io.github.fvarrui.fxorms.components.ListEditor;
 import io.github.fvarrui.fxorms.components.MapEditor;
@@ -302,6 +306,115 @@ public class FormTest {
 				.build()
 				.bind(person));
 		assertEquals("ADA", call(control(form, "First name", Label.class)::getText));
+	}
+
+	// number and date-time formatting
+
+	public static class FormattedBean {
+		IntegerProperty id = new SimpleIntegerProperty();
+		@Format("#,##0.00")
+		DoubleProperty price = new SimpleDoubleProperty();
+		ObjectProperty<LocalDateTime> when = new SimpleObjectProperty<>();
+		@Format("yyyy-MM-dd HH:mm:ss")
+		ObjectProperty<LocalDateTime> stamp = new SimpleObjectProperty<>();
+	}
+
+	private static <T> T withLocale(Locale locale, Callable<T> task) throws Exception {
+		Locale previous = Locale.getDefault();
+		Locale.setDefault(locale);
+		try {
+			return task.call();
+		} finally {
+			Locale.setDefault(previous);
+		}
+	}
+
+	private static boolean isInvalid(Node control) {
+		return call(() -> control.getPseudoClassStates().contains(TextBinding.INVALID));
+	}
+
+	@Test
+	void integersAreShownWithoutGrouping() throws Exception {
+		FormattedBean bean = new FormattedBean();
+		bean.id.set(12345);
+		Form<FormattedBean> form = withLocale(Locale.US, () -> call(() -> new FormBuilder<>(FormattedBean.class).build().bind(bean)));
+		assertEquals("12345", call(control(form, "Id", TextField.class)::getText));
+	}
+
+	@Test
+	void invalidNumberIsMarkedAndLeavesThePropertyUnchanged() {
+		Person person = new Person();
+		person.age.set(36);
+		Form<Person> form = call(() -> new FormBuilder<>(Person.class).build().bind(person));
+		TextField age = control(form, "Age", TextField.class);
+		for (String text : List.of("abc", "12abc", "", "3.7")) {
+			run(() -> age.setText(text));
+			assertEquals(36, person.age.get(), "'" + text + "' must not change the property");
+			assertTrue(isInvalid(age), "'" + text + "' must mark the field as invalid");
+		}
+		run(() -> age.setText("41"));
+		assertEquals(41, person.age.get());
+		assertFalse(isInvalid(age));
+	}
+
+	@Test
+	void formatAnnotationAppliesToNumbers() throws Exception {
+		FormattedBean bean = new FormattedBean();
+		bean.price.set(1234.5);
+		Form<FormattedBean> form = withLocale(Locale.US, () -> call(() -> new FormBuilder<>(FormattedBean.class).build().bind(bean)));
+		TextField price = control(form, "Price", TextField.class);
+		assertEquals("1,234.50", call(price::getText));
+		run(() -> price.setText("99.9"));
+		assertEquals(99.9, bean.price.get());
+	}
+
+	@Test
+	void editingADateTimeKeepsItsSeconds() throws Exception {
+		FormattedBean bean = new FormattedBean();
+		bean.when.set(LocalDateTime.of(2024, 1, 2, 3, 4, 5));
+		Form<FormattedBean> form = withLocale(Locale.US, () -> call(() -> new FormBuilder<>(FormattedBean.class).build().bind(bean)));
+		TextField when = control(form, "When", TextField.class);
+		assertEquals("Jan 2, 2024, 3:04:05 AM", call(when::getText));
+		run(() -> when.setText("Jan 2, 2024, 3:05:05 am"));
+		assertEquals(LocalDateTime.of(2024, 1, 2, 3, 5, 5), bean.when.get());
+		assertFalse(isInvalid(when));
+	}
+
+	@Test
+	void invalidDateTimeIsMarkedAndEmptyClearsIt() {
+		FormattedBean bean = new FormattedBean();
+		LocalDateTime value = LocalDateTime.of(2024, 1, 2, 3, 4, 5);
+		bean.when.set(value);
+		Form<FormattedBean> form = call(() -> new FormBuilder<>(FormattedBean.class).build().bind(bean));
+		TextField when = control(form, "When", TextField.class);
+		run(() -> when.setText("not a date"));
+		assertEquals(value, bean.when.get());
+		assertTrue(isInvalid(when));
+		run(() -> when.setText(""));
+		assertEquals(null, bean.when.get());
+		assertFalse(isInvalid(when));
+	}
+
+	@Test
+	void formatAnnotationAppliesToDateTimes() {
+		FormattedBean bean = new FormattedBean();
+		bean.stamp.set(LocalDateTime.of(2024, 1, 2, 3, 4, 5));
+		Form<FormattedBean> form = call(() -> new FormBuilder<>(FormattedBean.class).build().bind(bean));
+		TextField stamp = control(form, "Stamp", TextField.class);
+		assertEquals("2024-01-02 03:04:05", call(stamp::getText));
+		run(() -> stamp.setText("2025-06-07 08:09:10"));
+		assertEquals(LocalDateTime.of(2025, 6, 7, 8, 9, 10), bean.stamp.get());
+	}
+
+	@Test
+	void modelChangesClearTheInvalidMark() {
+		Person person = new Person();
+		Form<Person> form = call(() -> new FormBuilder<>(Person.class).build().bind(person));
+		TextField age = control(form, "Age", TextField.class);
+		run(() -> age.setText("abc"));
+		run(() -> person.age.set(7));
+		assertEquals("7", call(age::getText));
+		assertFalse(isInvalid(age));
 	}
 
 	// collection editors
