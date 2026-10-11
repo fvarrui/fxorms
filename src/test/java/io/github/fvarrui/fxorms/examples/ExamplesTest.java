@@ -29,7 +29,7 @@ public class ExamplesTest {
 
 	@Test
 	void everyExampleBuilds() {
-		Examples.all().forEach((name, example) -> assertInstanceOf(Parent.class, call(example::get), name));
+		Examples.all().forEach(example -> assertInstanceOf(Parent.class, call(example.factory()::get), example.id()));
 	}
 
 	@Test

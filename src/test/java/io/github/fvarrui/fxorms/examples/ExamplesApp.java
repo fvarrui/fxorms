@@ -17,7 +17,7 @@ public class ExamplesApp extends Application {
 	public void start(Stage stage) {
 		TabPane tabs = new TabPane();
 		tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-		Examples.all().forEach((name, example) -> tabs.getTabs().add(new Tab(name, new ScrollPane(example.get()))));
+		Examples.all().forEach(example -> tabs.getTabs().add(new Tab(example.title(), new ScrollPane(example.factory().get()))));
 		stage.setTitle("f(x)orms examples");
 		stage.setScene(new Scene(tabs, 800, 520));
 		stage.show();

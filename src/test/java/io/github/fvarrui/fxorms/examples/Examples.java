@@ -2,8 +2,7 @@ package io.github.fvarrui.fxorms.examples;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.function.Supplier;
 
 import io.github.fvarrui.fxorms.Form;
@@ -31,21 +30,27 @@ public final class Examples {
 	private Examples() {
 	}
 
-	/** Every example by name; the name is also the screenshot file name. */
-	public static Map<String, Supplier<Parent>> all() {
-		Map<String, Supplier<Parent>> examples = new LinkedHashMap<>();
-		examples.put("quick-start", Examples::quickStart);
-		examples.put("edit-dialog", Examples::editDialog);
-		examples.put("read-only", Examples::readOnly);
-		examples.put("customizing", Examples::customizing);
-		examples.put("validation", Examples::validation);
-		examples.put("collections", Examples::collections);
-		examples.put("inheritance", Examples::inheritance);
-		examples.put("master-detail", Examples::masterDetail);
-		examples.put("custom-adapter", Examples::customAdapter);
-		examples.put("custom-annotation", Examples::customAnnotation);
-		examples.put("styling", Examples::styling);
-		return examples;
+	/**
+	 * A README example: its id is the screenshot file name, its title the window
+	 * title in the screenshot and the tab name in {@link ExamplesApp}.
+	 */
+	public record Example(String id, String title, Supplier<Parent> factory) {
+	}
+
+	/** Every example, in README order. */
+	public static List<Example> all() {
+		return List.of(
+				new Example("quick-start", "Quick start", Examples::quickStart),
+				new Example("edit-dialog", "Edit in a dialog", Examples::editDialog),
+				new Example("master-detail", "Master-detail", Examples::masterDetail),
+				new Example("read-only", "Read-only and computed values", Examples::readOnly),
+				new Example("customizing", "Labels, order and formats", Examples::customizing),
+				new Example("validation", "Input validation", Examples::validation),
+				new Example("collections", "Lists and maps", Examples::collections),
+				new Example("inheritance", "Inheritance", Examples::inheritance),
+				new Example("custom-adapter", "Custom adapter", Examples::customAdapter),
+				new Example("custom-annotation", "Custom annotation", Examples::customAnnotation),
+				new Example("styling", "Styling", Examples::styling));
 	}
 
 	public static Parent quickStart() {
