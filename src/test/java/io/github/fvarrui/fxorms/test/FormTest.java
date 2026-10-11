@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -625,6 +627,27 @@ public class FormTest {
 	void labelAndOrderAnnotationsAndAcronymsInLabels() {
 		Form<LabelledBean> form = call(() -> new FormBuilder<>(LabelledBean.class).build());
 		assertEquals(List.of("E-mail address:", "Third:", "First:", "User ID:", "URL path:"), labels(form));
+	}
+
+	// access to controls
+
+	@Test
+	void getControlReturnsThePropertysControlBeforeAndAfterBinding() {
+		Form<Person> form = call(() -> new FormBuilder<>(Person.class).build());
+		TextField firstName = control(form, "First name", TextField.class);
+		assertSame(firstName, form.getControl("firstName"));
+		assertSame(control(form, "Extra", MapEditor.class), form.getControl("extra"));
+		run(() -> form.bind(new Person()));
+		assertSame(firstName, form.getControl("firstName"));
+	}
+
+	@Test
+	void getControlRejectsUnknownProperties() {
+		Form<Person> form = call(() -> new FormBuilder<>(Person.class).build());
+		IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> form.getControl("nickname"));
+		assertTrue(error.getMessage().contains("nickname"));
+		assertTrue(error.getMessage().contains(Person.class.getName()));
+		assertThrows(IllegalArgumentException.class, () -> form.getControl("notAProperty"));
 	}
 
 	// collection editors

@@ -111,6 +111,7 @@ The result is the form at the top of this page. Whatever the user types goes str
 - **Order.** Rows follow the order in which the fields are declared, superclass fields first. Use `@Order` to change it.
 - **Controls.** Each row's control is chosen by the property type; see [Supported types](#supported-types).
 - **Binding.** `form.bind(bean)` connects the controls to that object's properties, after disconnecting the previous one. `form.unbind()` disconnects it, and `form.getBean()` returns the bound object.
+- **Access to controls.** `form.getControl("email")` returns the control built for a property (named after its accessor, `emailProperty()`), for example to focus it or add a tooltip.
 
 ## Use cases
 
@@ -212,9 +213,10 @@ public class Product {
 Numbers and date-times are typed as text. When the text can't be converted, the field turns red and the bean keeps its last valid value; the mark goes away as soon as the text is valid again. Integers are shown without thousands separators, and date-times keep their seconds.
 
 ```java
-stockField.setText("25 units");   // what a user might type
+TextField stock = (TextField) form.getControl("stock");
+stock.setText("25 units");     // what a user might type
 
-product.getStock();               // still 25
+product.getStock();            // still 25
 ```
 
 ![Units in stock field marked in red because of invalid input](assets/examples/validation.png)

@@ -9,14 +9,11 @@ import io.github.fvarrui.fxorms.Form;
 import io.github.fvarrui.fxorms.FormBuilder;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
@@ -95,7 +92,7 @@ public final class Examples {
 		Product product = sampleProduct();
 		Form<Product> form = new FormBuilder<>(Product.class).build().bind(product);
 		// what a user might type: the field turns red and product.getStock() keeps 25
-		((TextField) controlOf(form, "Units in stock")).setText("25 units");
+		((TextField) form.getControl("stock")).setText("25 units");
 		return form;
 	}
 
@@ -150,7 +147,7 @@ public final class Examples {
 	public static Parent styling() {
 		Form<Product> form = new FormBuilder<>(Product.class).build().bind(sampleProduct());
 		form.getStylesheets().add(Examples.class.getResource("styling.css").toExternalForm());
-		((TextField) controlOf(form, "Price")).setText("free");
+		((TextField) form.getControl("price")).setText("free");
 		return form;
 	}
 
@@ -164,20 +161,6 @@ public final class Examples {
 		product.stockProperty().set(25);
 		product.availableFromProperty().set(LocalDateTime.of(2025, 5, 25, 9, 0));
 		return product;
-	}
-
-	/** The control in the row with the given label (examples only; forms don't expose their controls). */
-	static Node controlOf(Form<?> form, String label) {
-		for (Node node : form.getChildren()) {
-			if (node instanceof Label && (label + ":").equals(((Label) node).getText())) {
-				int row = GridPane.getRowIndex(node);
-				return form.getChildren().stream()
-						.filter(other -> GridPane.getRowIndex(other) == row && GridPane.getColumnIndex(other) == 1)
-						.findFirst()
-						.orElseThrow();
-			}
-		}
-		throw new IllegalArgumentException("No row labelled " + label);
 	}
 
 }

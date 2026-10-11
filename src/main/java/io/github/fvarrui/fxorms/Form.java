@@ -23,16 +23,42 @@ import javafx.scene.layout.GridPane;
 public class Form<T> extends GridPane {
 
 	private T bean;
+	private final Class<T> beanClass;
 	private final FieldFactory factory;
 	private final Map<BeanProperty, Node> controls = new LinkedHashMap<>();
 
-	Form(FieldFactory factory) {
+	Form(Class<T> beanClass, FieldFactory factory) {
 		super();
+		this.beanClass = beanClass;
 		this.factory = factory;
 	}
 
 	void addControl(BeanProperty property, Node control) {
 		controls.put(property, control);
+	}
+
+	/**
+	 * Returns the control the form built for a property, for example to focus
+	 * it, add a tooltip or listen to it:
+	 * <pre>{@code
+	 * Form<Person> form = new FormBuilder<>(Person.class).build();
+	 * form.getControl("email").requestFocus();
+	 * }</pre>
+	 * The control is the same before and after binding a bean; its type depends
+	 * on the property's adapter (e.g. a {@code TextField} for a string).
+	 *
+	 * @param propertyName the property name, as returned by
+	 *                     {@link BeanProperty#getName()}: {@code "email"} for
+	 *                     {@code emailProperty()}
+	 * @return the property's control
+	 * @throws IllegalArgumentException if the form has no property with that name
+	 */
+	public Node getControl(String propertyName) {
+		return controls.entrySet().stream()
+				.filter(entry -> entry.getKey().getName().equals(propertyName))
+				.map(Map.Entry::getValue)
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("No property '" + propertyName + "' in the form of " + beanClass.getName()));
 	}
 
 	/**

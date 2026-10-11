@@ -58,7 +58,7 @@ public class FormBuilder<T> {
 		
 		try { 
 
-			Form<T> form = new Form<>(factory);
+			Form<T> form = new Form<>(beanClass, factory);
 			form.setHgap(5);
 			form.setVgap(5);
 			form.setPadding(new Insets(5));

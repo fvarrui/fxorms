@@ -36,7 +36,7 @@ public class ExamplesTest {
 	void quickStartShowsTheBean() {
 		Form<?> form = (Form<?>) call(Examples::quickStart);
 		assertEquals(List.of("First name:", "Last name:", "Email:", "Birth date:", "Subscribed:"), labels(form));
-		assertEquals("ada@example.com", ((TextField) Examples.controlOf(form, "Email")).getText());
+		assertEquals("ada@example.com", ((TextField) form.getControl("email")).getText());
 	}
 
 	@Test
@@ -46,8 +46,8 @@ public class ExamplesTest {
 		try {
 			Form<?> form = (Form<?>) call(Examples::customizing);
 			assertEquals(List.of("SKU:", "Name:", "Description:", "Category:", "Price:", "Units in stock:", "Available from:"), labels(form));
-			assertEquals("1,234.50", ((TextField) Examples.controlOf(form, "Price")).getText());
-			assertEquals("2025-05-25 09:00", ((TextField) Examples.controlOf(form, "Available from")).getText());
+			assertEquals("1,234.50", ((TextField) form.getControl("price")).getText());
+			assertEquals("2025-05-25 09:00", ((TextField) form.getControl("availableFrom")).getText());
 		} finally {
 			Locale.setDefault(previous);
 		}
@@ -56,7 +56,7 @@ public class ExamplesTest {
 	@Test
 	void validationKeepsTheBeanValue() {
 		Form<?> form = (Form<?>) call(Examples::validation);
-		TextField stock = (TextField) Examples.controlOf(form, "Units in stock");
+		TextField stock = (TextField) form.getControl("stock");
 		assertTrue(stock.getPseudoClassStates().contains(TextBinding.INVALID));
 		assertEquals(25, ((Product) form.getBean()).stockProperty().get());
 	}
@@ -77,10 +77,10 @@ public class ExamplesTest {
 	@Test
 	void customAdaptersRenderTheirTypes() {
 		Form<?> theme = (Form<?>) call(Examples::customAdapter);
-		assertInstanceOf(ColorPicker.class, Examples.controlOf(theme, "Background"));
+		assertInstanceOf(ColorPicker.class, theme.getControl("background"));
 		Form<?> audio = (Form<?>) call(Examples::customAnnotation);
-		assertInstanceOf(Slider.class, Examples.controlOf(audio, "Volume"));
-		assertInstanceOf(TextField.class, Examples.controlOf(audio, "Sample rate"));
+		assertInstanceOf(Slider.class, audio.getControl("volume"));
+		assertInstanceOf(TextField.class, audio.getControl("sampleRate"));
 	}
 
 	private static List<String> labels(Form<?> form) {
