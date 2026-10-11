@@ -32,7 +32,7 @@ form.bind(person);
 
 - **No form code.** One row per property, inherited ones included, with a control chosen by type.
 - **Two-way binding.** Edits update the bean and bean changes show up in the form. One form can be rebound to other objects at any time.
-- **Read-only properties.** Use `@ReadOnly`, or expose a `ReadOnlyXxxProperty`.
+- **Read-only properties.** Use `@ReadOnly`, or expose a `ReadOnlyXxxProperty`. They're greyed out, and their text can still be copied.
 - **Input validation.** Numbers and dates that can't be parsed are marked in red and never reach the bean.
 - **Annotations** for labels, order, formats and multi-line text.
 - **Extensible.** Plug in your own adapters to render any type, or to change how a type is rendered.
@@ -152,7 +152,7 @@ list.getSelectionModel().selectedItemProperty().addListener((o, previous, select
 
 ### Read-only and computed values
 
-`@ReadOnly` locks a property that is writable in the bean. A property exposed only as `ReadOnlyXxxProperty` is always read-only, and the form keeps showing its latest value when your code changes it.
+`@ReadOnly` locks a property that is writable in the bean. A property exposed only as `ReadOnlyXxxProperty` is always read-only, and the form keeps showing its latest value when your code changes it. Read-only text fields are greyed out, but their text can still be selected and copied.
 
 ```java
 public class Account {
