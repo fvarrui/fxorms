@@ -1,6 +1,8 @@
 package io.github.fvarrui.fxorms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.fvarrui.fxorms.adapters.BooleanAdapter;
@@ -16,17 +18,27 @@ import javafx.scene.Node;
 
 public class FieldFactory {
 	
-	private List<FieldAdapter<? extends Node, ? extends Observable>> adapters = Arrays.asList(
+	private final List<FieldAdapter<? extends Node, ? extends Observable>> adapters = new ArrayList<>(Arrays.asList(
 			new StringAdapter(),
 			new NumberAdapter(),
 			new LocalDateTimeAdapter(),
 			new BooleanAdapter(),
 			new MapAdapter(),
 			new ListAdapter()
-	);
+	));
 	
 	public List<FieldAdapter<? extends Node, ? extends Observable>> getAdapters() {
-		return adapters;
+		return Collections.unmodifiableList(adapters);
+	}
+
+	/**
+	 * Registers a custom adapter. Custom adapters are looked up before the
+	 * built-in ones (and the latest registered first), so they can override them.
+	 */
+	public void registerAdapter(FieldAdapter<? extends Node, ? extends Observable> adapter) {
+		if (adapter != null) {
+			adapters.add(0, adapter);
+		}
 	}
 	
 	public FieldAdapter<? extends Node, ? extends Observable> findAdapter(java.lang.reflect.Field field) { 

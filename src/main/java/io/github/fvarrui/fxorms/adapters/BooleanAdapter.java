@@ -10,7 +10,7 @@ import javafx.scene.control.CheckBox;
 public class BooleanAdapter extends FieldAdapter<CheckBox, Property<Boolean>> {
 	
 	public BooleanAdapter() {
-		super(BooleanProperty.class, ReadOnlyBooleanWrapper.class);
+		super(BooleanProperty.class);
 	}
 	
 	@Override

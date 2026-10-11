@@ -2,8 +2,10 @@ package io.github.fvarrui.fxorms.adapters;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,7 @@ public abstract class FieldAdapter<T extends Node, U> {
 	}
 
 	public boolean isPropertyType(Field field) {
-		return forTypes.contains(field.getType());
+		return forTypes.stream().anyMatch(type -> type.isAssignableFrom(field.getType()));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -44,11 +46,24 @@ public abstract class FieldAdapter<T extends Node, U> {
 	}
 	
 	public static List<Class<?>> getGenericTypes(Field field) {
+		if (!(field.getGenericType() instanceof ParameterizedType)) {
+			return Collections.emptyList();
+		}
 		ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-		return  Arrays.asList(genericType.getActualTypeArguments())
+		return Arrays.asList(genericType.getActualTypeArguments())
 				.stream()
-				.map(type -> (Class<?>) type)
+				.map(FieldAdapter::toClass)
 				.collect(Collectors.toList());
+	}
+
+	private static Class<?> toClass(Type type) {
+		if (type instanceof Class) {
+			return (Class<?>) type;
+		}
+		if (type instanceof ParameterizedType) {
+			return (Class<?>) ((ParameterizedType) type).getRawType();
+		}
+		return Object.class; // wildcards and type variables
 	}
 	
 }

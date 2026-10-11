@@ -83,21 +83,22 @@ public class MapEditor extends BorderPane implements Initializable {
 
 	private void onMapChanged(Change<? extends String, ? extends Object> change) {
 		
-		if (change.wasAdded()) {
-			
-			entries.add(new Pair<>(change.getKey(), change.getValueAdded()));
-			
-		} else {
-			
-			entries.remove(new Pair<>(change.getKey(), change.getValueRemoved()));
-			
+		int index = change.wasRemoved() ? entries.indexOf(new Pair<>(change.getKey(), change.getValueRemoved())) : -1;
+		Pair<String, Object> added = change.wasAdded() ? new Pair<>(change.getKey(), change.getValueAdded()) : null;
+		
+		if (added != null && index >= 0) {
+			entries.set(index, added); // value replaced: keep its position
+		} else if (added != null) {
+			entries.add(added);
+		} else if (index >= 0) {
+			entries.remove(index);
 		}
 		
 	}
 
 	@FXML
 	void onRemoveAction(ActionEvent event) {
-		entries.remove(selectedEntry.get());
+		map.remove(selectedEntry.get().getKey());
 	}
 
 	public final MapProperty<String, Object> mapProperty() {

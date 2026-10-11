@@ -2,6 +2,7 @@ package io.github.fvarrui.fxorms.adapters;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.List;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -18,7 +19,11 @@ public abstract class ObjectAdapter<T extends Node, U extends Observable> extend
 	
 	@Override
 	public boolean isPropertyType(Field field) {
-		return super.isPropertyType(field) && ((Class<?>) genericType).isAssignableFrom(getGenericTypes(field).get(0));
+		if (!super.isPropertyType(field)) {
+			return false;
+		}
+		List<Class<?>> genericTypes = getGenericTypes(field);
+		return !genericTypes.isEmpty() && ((Class<?>) genericType).isAssignableFrom(genericTypes.get(0));
 	}	
 	
 }

@@ -31,7 +31,7 @@
 			<children>
 				<Button fx:id="removeButton" contentDisplay="GRAPHIC_ONLY"
 					layoutX="15.0" layoutY="10.0" maxWidth="1.7976931348623157E308"
-					onAction="#onRemoveAction" text="Add">
+					onAction="#onRemoveAction" text="Remove">
 					<graphic>
 						<ImageView pickOnBounds="true" preserveRatio="true">
 							<image>

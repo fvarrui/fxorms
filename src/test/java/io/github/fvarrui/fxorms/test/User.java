@@ -36,7 +36,7 @@ public class User {
 		setName(name);
 		setLastLogin(lastLogin);
 		getPreferences().putAll(preferences);
-		this.enabled.set(true);
+		this.enabled.set(enabled);
 	}
 
 	public final IntegerProperty idProperty() {

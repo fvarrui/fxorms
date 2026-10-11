@@ -13,7 +13,7 @@
    <right>
       <VBox spacing="5.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="removeButton" contentDisplay="GRAPHIC_ONLY" layoutX="15.0" layoutY="10.0" maxWidth="1.7976931348623157E308" onAction="#onRemoveAction" text="Add">
+            <Button fx:id="removeButton" contentDisplay="GRAPHIC_ONLY" layoutX="15.0" layoutY="10.0" maxWidth="1.7976931348623157E308" onAction="#onRemoveAction" text="Remove">
                <tooltip>
                   <Tooltip text="Remove item" />
                </tooltip>

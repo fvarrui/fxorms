@@ -2,9 +2,7 @@ package io.github.fvarrui.fxorms;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.github.fvarrui.fxorms.adapters.FieldAdapter;
@@ -23,7 +21,6 @@ public class FormBuilder<T> {
 	
 	private Class<T> beanClass;
 	private FieldFactory factory;
-	private Map<Field, Node> controls = new HashMap<>();
 
 	public FormBuilder(Class<T> beanClass) {
 		this.factory = new FieldFactory();
@@ -34,7 +31,7 @@ public class FormBuilder<T> {
 		
 		try { 
 
-			Form<T> form = new Form<>(this);
+			Form<T> form = new Form<>(factory);
 			form.setHgap(5);
 			form.setVgap(5);
 			form.setPadding(new Insets(5));
@@ -58,7 +55,7 @@ public class FormBuilder<T> {
 				Label label = new Label(getReadableStringFromCamelCase(field.getName()) + ":");
 				Node control = factory.buildControl(field); 
 				
-				controls.put(field, control);
+				form.addControl(field, control);
 				
 				form.addRow(
 					form.getRowCount(), 
@@ -88,20 +85,8 @@ public class FormBuilder<T> {
 			.collect(Collectors.toList());		
 	}
 	
-	public void bind(Field field, Observable property) {
-		Node control = controls.get(field);
-		factory.findAdapter(field).bind(control, property);
-	}
-	
-	public void unbind(Field field, Property<?> property) {
-		Node control = controls.get(field);
-		factory.findAdapter(field).unbind(control, property);		
-	}
-	
 	public FormBuilder<T> registerFieldAdapter(FieldAdapter<? extends Node, ? extends Observable> adapter) {
-		if (adapter != null) {
-			factory.getAdapters().add(adapter);
-		}
+		factory.registerAdapter(adapter);
 		return this;
 	}
 	

@@ -1,5 +1,9 @@
 package io.github.fvarrui.fxorms;
 
+import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javafx.beans.property.Property;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
@@ -7,58 +11,50 @@ import javafx.scene.layout.GridPane;
 public class Form<T> extends GridPane {
 
 	private T bean;
-	private FormBuilder<T> builder;
+	private final FieldFactory factory;
+	private final Map<Field, Node> controls = new LinkedHashMap<>();
 
-	public Form(FormBuilder<T> builder) {
+	Form(FieldFactory factory) {
 		super();
-		this.builder = builder;
+		this.factory = factory;
+	}
+
+	void addControl(Field field, Node control) {
+		controls.put(field, control);
+	}
+
+	public T getBean() {
+		return bean;
 	}
 
 	public Form<T> bind(T bean) {
-		if (bean == null) {
-			unbind();
-		} else {
+		unbind();
+		if (bean != null) {
 			this.bean = bean;
-			builder.getFields().forEach(field -> {
-				try {
-					field.setAccessible(true);
-					Property<?> property = (Property<?>) field.get(this.bean);
-					builder.bind(field, property);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			});
+			controls.forEach((field, control) -> factory.findAdapter(field).bind(control, getProperty(field, bean)));
 		}
 		return this;
 	}
 
 	public Form<T> unbind() {
 		if (this.bean != null) {
-			builder.getFields().forEach(field -> {
-				try {
-					field.setAccessible(true);
-					Property<?> property = (Property<?>) field.get(this.bean);
-					builder.unbind(field, property);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			});
+			controls.forEach((field, control) -> factory.findAdapter(field).unbind(control, getProperty(field, this.bean)));
+			this.bean = null;
 		}
 		return this;
 	}
 
-	protected int getRowCount() {
-		int numRows = getRowConstraints().size();
-		for (int i = 0; i < getChildren().size(); i++) {
-			Node child = getChildren().get(i);
-			if (child.isManaged()) {
-				Integer rowIndex = GridPane.getRowIndex(child);
-				if (rowIndex != null) {
-					numRows = Math.max(numRows, rowIndex + 1);
-				}
+	private Property<?> getProperty(Field field, T bean) {
+		try {
+			field.setAccessible(true);
+			Property<?> property = (Property<?>) field.get(bean);
+			if (property == null) {
+				throw new IllegalStateException("Property field '" + field.getName() + "' is not initialized");
 			}
+			return property;
+		} catch (IllegalAccessException e) {
+			throw new IllegalStateException("Cannot read property field '" + field.getName() + "'", e);
 		}
-		return numRows;
 	}
 
 }
