@@ -17,8 +17,9 @@ The project description, architecture, stack and conventions live in `.minispec/
 - Tests touch JavaFX through `FxThread` (`src/test/java/.../FxThread.java`): `FxThread.call(...)`/`run(...)` execute on the FX thread and wait. Controls in a built form are found by their row label (see `FormTest.control(...)`).
 - `EditUserApp` and `User` are a manual visual demo; `AppTest` launches it but is `@Disabled` because it blocks until the window is closed.
 
-## Release
+## Project skills
 
-- Set the release version in `pom.xml`, commit, tag `vX.Y.Z` and push; then create the GitHub release with the jars and `.asc` files from `target/`.
-- `mvn -P release deploy` builds the sources and javadoc jars, signs everything with GPG (key `F113D3E7`, passphrase in `MAVEN_GPG_PASSPHRASE`) and uploads the bundle to the Central Portal using server `central` in `~/.m2/settings.xml`. It waits until the bundle is validated; publishing is done by hand at https://central.sonatype.com/publishing/deployments.
-- Afterwards, bump `pom.xml` to the next `-SNAPSHOT` version.
+- `verify` runs the checks (tests, Javadoc lint and, when modules, packages or FXML change, a module-path smoke test). Use it before commits and releases.
+- `add-adapter` adds support for a new property type following the project conventions.
+- `release` releases a version: notes, signing, Maven Central upload, tag, GitHub release and next snapshot; it also publishes an existing tag on Central.
+- `minispec-feature`, `minispec-bugfix`, `minispec-adr` and `minispec-implement` manage the specs in `.minispec/`.
